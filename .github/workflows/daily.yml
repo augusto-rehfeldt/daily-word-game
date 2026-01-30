@@ -25,6 +25,7 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add index.html
+          git add index.html games README.md
           git diff --cached --quiet || git commit -m "Daily word game"
           git push
+

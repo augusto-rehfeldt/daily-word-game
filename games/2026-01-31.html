@@ -25,9 +25,9 @@
   .rules{font-size:13px;line-height:1.35;color:var(--muted)}
   .rules b{color:var(--ink)}
   .streambox{margin-top:12px}
-  .stream{display:flex;align-items:center;justify-content:center;gap:0;background:#0f141b;border:1px solid #1f2633;border-radius:10px;padding:10px 10px;user-select:none}
+  .stream{display:flex;align-items:center;justify-content:center;gap:0;background:#0f141b;border:1px solid #1f2633;border-radius:10px;padding:10px 10px;user-select:none;flex-wrap:wrap;row-gap:8px}
   .cell{width:28px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:linear-gradient(#15202b,#121923);border:1px solid #1f2734;font-weight:700;letter-spacing:0.5px}
-  .gap{width:14px;height:44px;position:relative;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center}
+  .gap{width:14px;height:44px;position:relative;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .gap:hover{background:rgba(89,176,255,0.12)}
   .gap::after{content:"";width:2px;height:24px;background:var(--gap);border-radius:2px;transition:all .12s ease}
   .gap.cut::after{width:4px;height:30px;background:var(--cut);box-shadow:0 0 6px rgba(255,90,96,.45)}
@@ -62,6 +62,17 @@
   .tiny{font-size:11px;color:#7f8a99}
   @media (max-width: 840px){
     .seglist,.cluelist{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width: 600px){
+    .stream{padding:8px 4px}
+    .cell{width:24px;height:34px;font-size:14px}
+    .gap{width:10px;height:40px}
+    .gap::after{height:18px}
+    .gap.cut::after{height:24px}
+    .under{flex-direction:column}
+    .seglist,.cluelist{grid-template-columns:1fr}
+    .btns{justify-content:center;width:100%}
+    button{flex:1;min-width:120px}
   }
 </style>
 </head>

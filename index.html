@@ -2,485 +2,385 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>GaugeWord — Daily</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cutline — Today’s Daily Word Split</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root{
-    --bg:#0f1320;
-    --panel:#171d2e;
-    --ink:#e9eef6;
-    --muted:#9fb0c8;
-    --accent:#5dd0ff;
-    --good:#5de094;
-    --warn:#ffd166;
-    --bad:#ff6b6b;
-    --chip:#22283a;
+    --bg:#0e1116;
+    --panel:#161b22;
+    --ink:#e6edf3;
+    --muted:#9aa4b2;
+    --accent:#59b0ff;
+    --ok:#35c27c;
+    --warn:#ff6d6d;
+    --cut:#ff5a60;
+    --gap:#2a3342;
   }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial,sans-serif}
-  .wrap{
-    max-width:1100px;
-    margin:0 auto;
-    padding:16px 18px;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    height:100vh;
-  }
-  header{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 14px;border-radius:10px;background:var(--panel);
-  }
-  .title{
-    display:flex;align-items:baseline;gap:10px;
-  }
-  h1{font-size:22px;margin:0;letter-spacing:.5px}
-  .day{
-    font-size:13px;color:var(--muted);padding:2px 8px;border-radius:999px;background:var(--chip)}
-  .legend{
-    display:flex;gap:14px;align-items:center;
-    font-size:13px;color:var(--muted)
-  }
-  .legend b{color:var(--ink);font-weight:600}
-  .legend .pill{display:inline-flex;align-items:center;gap:6px;background:var(--chip);padding:6px 8px;border-radius:8px}
-  .legend .arrow{font-weight:700}
-  main{
-    display:grid;grid-template-columns:1.2fr .8fr;gap:12px;min-height:0; /* allow inner scroll */
-  }
-  .panel{background:var(--panel);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:0}
-  .rules ul{margin:6px 0 0 18px;padding:0}
-  .rules li{margin:6px 0;color:var(--muted);font-size:14px}
-  .metrics-head{
-    display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)
-  }
-  .metrics-head .badge{padding:3px 8px;border-radius:6px;background:var(--chip);color:var(--ink);font-weight:600}
-  .inputRow{
-    display:flex;gap:8px;align-items:center
-  }
-  input[type=text]{
-    flex:1;border:1px solid transparent;background:var(--chip);color:var(--ink);
-    padding:10px 12px;border-radius:8px;font-size:16px;outline:none;
-  }
-  input[type=text]::placeholder{color:#7c8aa5}
-  button{
-    background:var(--accent);color:#001018;border:none;border-radius:8px;
-    padding:10px 12px;font-weight:700;font-size:14px;cursor:pointer;
-  }
-  button.secondary{
-    background:transparent;border:1px solid #2a3248;color:var(--muted)
-  }
-  button:disabled{opacity:.5;cursor:not-allowed}
-  .msg{min-height:20px;font-size:13px;color:var(--muted)}
-  .board{
-    background:rgba(255,255,255,0.02);
-    border:1px solid #20263a;border-radius:8px;overflow:auto;min-height:0;flex:1
-  }
-  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-  thead th{
-    position:sticky;top:0;background:#1a2135;border-bottom:1px solid #2a3248;
-    font-size:12px;color:var(--muted);padding:8px 6px
-  }
-  tbody td{padding:8px 6px;border-bottom:1px dashed #212840;font-size:15px}
-  tbody tr:last-child td{border-bottom:none}
-  .guess{font-weight:800;letter-spacing:.6px}
-  .cell{
-    display:flex;align-items:center;justify-content:center;gap:6px
-  }
-  .val{font-weight:700}
-  .arrow{width:22px;text-align:center;font-weight:900}
-  .up{color:var(--warn)}
-  .down{color:var(--bad)}
-  .eq{color:var(--good)}
-  .footer{
-    display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:13px
-  }
-  .win{
-    background:linear-gradient(90deg,#1f2b44,transparent);
-    border:1px solid #2e3b59;color:#bff3cb;padding:8px 10px;border-radius:8px;
-    font-weight:700;display:none
-  }
+  html,body{height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;margin:0}
+  .wrap{max-width:980px;margin:0 auto;padding:18px 20px;box-sizing:border-box}
+  header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px}
+  h1{font-size:22px;margin:0;letter-spacing:.3px}
+  .sub{color:var(--muted);font-size:13px}
+  .panel{background:var(--panel);border:1px solid #222a36;border-radius:10px;padding:14px 14px}
+  .rules{font-size:13px;line-height:1.35;color:var(--muted)}
+  .rules b{color:var(--ink)}
+  .streambox{margin-top:12px}
+  .stream{display:flex;align-items:center;justify-content:center;gap:0;background:#0f141b;border:1px solid #1f2633;border-radius:10px;padding:10px 10px;user-select:none}
+  .cell{width:28px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:linear-gradient(#15202b,#121923);border:1px solid #1f2734;font-weight:700;letter-spacing:0.5px}
+  .gap{width:14px;height:44px;position:relative;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center}
+  .gap:hover{background:rgba(89,176,255,0.12)}
+  .gap::after{content:"";width:2px;height:24px;background:var(--gap);border-radius:2px;transition:all .12s ease}
+  .gap.cut::after{width:4px;height:30px;background:var(--cut);box-shadow:0 0 6px rgba(255,90,96,.45)}
+  .gap.lock{cursor:not-allowed}
+  .under{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+  .segments, .clues{flex:1;min-width:300px}
+  .segments h3,.clues h3{font-size:13px;margin:0 0 8px 2px;color:var(--muted);font-weight:600;letter-spacing:.3px}
+  .seglist{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .seg{background:#0f141b;border:1px solid #1f2633;border-radius:8px;min-height:42px;display:flex;align-items:center;justify-content:center;font-weight:700;letter-spacing:.4px}
+  .seg.ok{border-color:#1f3b2c;background:linear-gradient(#102017,#0b1611);color:var(--ok)}
+  .seg.wait{opacity:.9}
+  .seg.empty{color:var(--muted);font-weight:600}
+  .cluelist{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .clue{background:#0f141b;border:1px dashed #2a3342;border-radius:8px;padding:8px;min-height:42px;display:flex;flex-direction:column;gap:2px}
+  .clue .num{font-size:11px;color:var(--muted)}
+  .clue .txt{font-size:13px}
+  .length{font-size:11px;color:var(--muted)}
+  .bar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap}
+  .btns{display:flex;gap:8px;flex-wrap:wrap}
+  button{background:#152030;color:var(--ink);border:1px solid #263041;border-radius:8px;padding:8px 10px;font-weight:600;cursor:pointer;transition:.12s;font-size:13px}
+  button:hover{border-color:#39506a;background:#18263a}
+  button.primary{background:#1a2f47;border-color:#2c4a6b;color:#cde6ff}
+  button.primary:hover{background:#1e3a58}
+  .status{font-size:13px;color:var(--muted)}
+  .status strong{color:var(--ink)}
+  .win{display:none;margin-top:12px;padding:10px 12px;border:1px solid #1d3d2a;background:#0f1c14;border-radius:8px;color:var(--ok);font-weight:700}
   .win.show{display:block}
-  .share{
-    display:flex;gap:8px;align-items:center
+  .hinted .length{display:inline}
+  .length{display:none}
+  .tag{display:inline-block;background:#132034;border:1px solid #213149;color:#a9c7ec;border-radius:6px;padding:2px 6px;font-size:11px;margin-left:6px}
+  footer{margin-top:14px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;align-items:center}
+  .tiny{font-size:11px;color:#7f8a99}
+  @media (max-width: 840px){
+    .seglist,.cluelist{grid-template-columns:repeat(2,1fr)}
   }
-  .tiny{font-size:12px;color:var(--muted)}
-  .sp{height:6px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="title">
-      <h1>GaugeWord</h1>
-      <span class="day" id="dayLabel">Daily</span>
+    <div>
+      <h1>Cutline</h1>
+      <div class="sub" id="dateLine"></div>
     </div>
-    <div class="legend">
-      <span class="pill"><span class="arrow up">▲</span> you need higher</span>
-      <span class="pill"><span class="arrow down">▼</span> you need lower</span>
-      <span class="pill"><span class="arrow eq">●</span> matched</span>
-    </div>
+    <div class="sub" id="puzzleId"></div>
   </header>
-  <main>
-    <section class="panel">
-      <div class="metrics-head">
-        <span class="badge">Rules</span>
+
+  <div class="panel rules">
+    Split the letter stream into four words that match the clues (left to right).
+    - Place exactly three cuts by clicking between letters. Click again to remove.
+    - Use every letter in order; no rearranging.
+    - When all four segments match, you win.
+  </div>
+
+  <div class="panel streambox">
+    <div id="stream" class="stream" aria-label="Letter stream"></div>
+
+    <div class="under">
+      <div class="segments">
+        <h3>Segments</h3>
+        <div id="seglist" class="seglist"></div>
       </div>
-      <div class="rules">
-        <ul>
-          <li>Guess any 4–7 letter English word. Press Enter or Guess.</li>
-          <li>After each guess, five gauges compare your word to today’s secret:</li>
-          <li style="list-style:none;margin-left:0">
-            <div class="legend">
-              <span class="pill"><b>Len</b> letters</span>
-              <span class="pill"><b>Sum</b> A1–Z26 total</span>
-              <span class="pill"><b>Vow</b> number of vowels (A,E,I,O,U)</span>
-              <span class="pill"><b>Min</b> earliest letter in your word</span>
-              <span class="pill"><b>Max</b> latest letter in your word</span>
-            </div>
-          </li>
-          <li>Arrows show direction: ▲ need higher, ▼ need lower, ● exact match.</li>
-          <li>Find the exact secret word to win. One new puzzle daily (UTC).</li>
-        </ul>
+      <div class="clues">
+        <h3>Clues</h3>
+        <div id="cluelist" class="cluelist"></div>
       </div>
-      <div class="sp"></div>
-      <div class="metrics-head">
-        <span class="badge">Make a guess</span>
+    </div>
+
+    <div class="bar">
+      <div class="btns">
+        <button id="checkBtn" class="primary">Check</button>
+        <button id="resetBtn">Reset Cuts</button>
+        <button id="hintBtn">Reveal Lengths</button>
+        <button id="giveBtn">Give Up (Show Cuts)</button>
       </div>
-      <div class="inputRow">
-        <input id="guessInput" type="text" placeholder="type a word..." autocomplete="off" maxlength="12" />
-        <button id="guessBtn">Guess</button>
-        <button id="giveUpBtn" class="secondary">Reveal</button>
-      </div>
-      <div class="msg" id="msg"></div>
-      <div id="win" class="win"></div>
-      <div class="sp"></div>
-      <div class="metrics-head">
-        <span class="badge">History</span>
-        <span class="tiny">(values shown for your guesses; target stays hidden)</span>
-      </div>
-      <div class="board">
-        <table>
-          <thead>
-            <tr>
-              <th style="text-align:left;width:30%">Guess</th>
-              <th>Len</th>
-              <th>Sum</th>
-              <th>Vow</th>
-              <th>Min</th>
-              <th>Max</th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
-      </div>
-      <div class="footer">
-        <div class="share">
-          <button id="copyBtn" class="secondary">Copy result</button>
-          <span id="copied" class="tiny" style="display:none">Copied!</span>
-        </div>
-        <div class="tiny">Tip: non‑words are accepted, but real words help more.</div>
-      </div>
-    </section>
-    <section class="panel">
-      <div class="metrics-head"><span class="badge">Today</span></div>
-      <div style="display:grid;grid-template-columns:1fr;gap:10px;font-size:14px;color:var(--muted)">
-        <div><b>Date (UTC):</b> <span id="dateUTC"></span></div>
-        <div><b>Puzzle #:</b> <span id="puzzleNo"></span></div>
-        <div><b>Target length:</b> <span id="lenHint">—</span></div>
-        <div class="tiny">Length is revealed so you can play compactly.</div>
-      </div>
-      <div class="sp"></div>
-      <div class="metrics-head"><span class="badge">Legend</span></div>
-      <div style="display:grid;gap:8px;color:var(--muted);font-size:14px">
-        <div>• Len: If you see ▲, the secret word has more letters than your guess. ▼ means fewer letters.</div>
-        <div>• Sum: Add A=1, B=2, …, Z=26 for each letter. ▲ means the secret’s total is higher.</div>
-        <div>• Vow: Counts only A, E, I, O, U as vowels.</div>
-        <div>• Min / Max: The earliest/latest letter in your word (alphabetically). ▲ means the secret’s letter is later in the alphabet; ▼ means earlier.</div>
-      </div>
-    </section>
-  </main>
+      <div class="status" id="status">Place 3 cuts to make 4 words.</div>
+    </div>
+    <div id="win" class="win">Solved! Nicely sliced.</div>
+  </div>
+
+  <footer>
+    <div class="tiny">Deterministic daily puzzle. No timers, no tricks.</div>
+    <div class="tiny">Tip: Think of familiar pairings that can nest together.</div>
+  </footer>
 </div>
 
 <script>
 (function(){
-  // Small curated list of target words (4–7 letters), deterministic by day (UTC)
-  const targets = [
-    "apple","bridge","chair","dance","eagle","forge","grain","honey","ivory","jelly","kneel","lemon","magic","night","ocean",
-    "pearl","queen","river","sugar","tidal","unity","vivid","woven","xenon","young","zebra","amber","blush","cabin","daisy",
-    "ember","fable","globe","harbor","inlet","jolly","karma","linen","meadow","novel","olive","piano","quilt","raven","sunny",
-    "thick","umbra","vigor","waltz","yeast","azure","briar","cider","drape","flock","gazer","hinge","irony","joist","knead",
-    "latch","mirth","nylon","ochre","prism","quark","riser","sleet","truce","udder","vowel","wafer","yodel","adore","banjo",
-    "cello","delta","ether","frost","giddy","hatch","icing","jaunt","koala","lumen","mango","noble","opine","petal","quill",
-    "reign","savor","trout","urban","valor","wharf","yacht","aspic","blaze","clang","droll","enact","femur","graft","humor",
-    "ingot","jumpy","knack","lapel","mossy","nudge","ovoid","pithy","quirk","rouse","shard","table","ultra","vixen","wrath",
-    "yearn","zesty","align","brisk","creed","dodge","elate","flint","grail","heist","idiom","joust","kiosk","lithe","mince",
-    "nurse","overt","proud","rhyme","scout","thrum","unite","vapor","wryly","aider","bough","croak"
+  // Daily set (32 entries). Each puzzle is four words; stream is their concatenation.
+  const PUZZLES = [
+    {words:["tiny","house","plant","pots"], clues:[
+      "very small","dwelling","living organism","containers"]},
+    {words:["quick","brown","fox","jumps"], clues:[
+      "rapid","color","cunning animal","leaps"]},
+    {words:["paper","clip","chain","links"], clues:[
+      "sheet","fastener","series","connections"]},
+    {words:["moon","light","sugar","cubes"], clues:[
+      "Earth's satellite","illumination","sweetener","blocks"]},
+    {words:["north","wind","chill","factor"], clues:[
+      "direction","breeze","coldness","component"]},
+    {words:["green","thumb","garden","tools"], clues:[
+      "color","digit","cultivated plot","implements"]},
+    {words:["coffee","table","book","stack"], clues:[
+      "beverage","furniture surface","volume","pile"]},
+    {words:["river","bank","loan","office"], clues:[
+      "flowing water","edge","borrowed money","workplace"]},
+    {words:["silent","film","star","system"], clues:[
+      "quiet","movie","celebrity","arrangement"]},
+    {words:["wheel","chair","ramp","access"], clues:[
+      "circular part","seat","incline","entry"]},
+    {words:["night","train","track","switch"], clues:[
+      "darkness","rail transport","path","change"]},
+    {words:["sound","proof","room","test"], clues:[
+      "noise","evidence","chamber","exam"]},
+    {words:["water","fall","color","grade"], clues:[
+      "liquid","drop","hue","rating"]},
+    {words:["solar","power","grid","failure"], clues:[
+      "sun-based","energy","network","breakdown"]},
+    {words:["bread","crumb","trail","marker"], clues:[
+      "loaf base","tiny bit","path","indicator"]},
+    {words:["clock","work","shop","window"], clues:[
+      "timepiece","labor","store","pane"]},
+    {words:["train","station","master","key"], clues:[
+      "rail vehicle","terminal","expert","opener"]},
+    {words:["stone","cold","press","juice"], clues:[
+      "rock","chilly","machine","drink"]},
+    {words:["space","bar","code","reader"], clues:[
+      "void","tavern","stripes & digits","device"]},
+    {words:["shadow","box","office","hours"], clues:[
+      "silhouette","container","ticket counter","times"]},
+    {words:["finger","print","screen","time"], clues:[
+      "digit","mark","display","duration"]},
+    {words:["silver","lining","cloud","cover"], clues:[
+      "precious metal","inner layer","sky puff","concealment"]},
+    {words:["market","place","setting","sun"], clues:[
+      "commerce","location","arrangement","evening star"]},
+    {words:["under","ground","water","pipe"], clues:[
+      "beneath","earth","liquid","tube"]},
+    {words:["heavy","metal","band","leader"], clues:[
+      "weighty","element","group","chief"]},
+    {words:["broken","heart","break","dance"], clues:[
+      "damaged","organ","pause","street style"]},
+    {words:["double","blind","taste","test"], clues:[
+      "twofold","sightless","flavor","trial"]},
+    {words:["mirror","ball","room","service"], clues:[
+      "reflector","sphere","chamber","assistance"]},
+    {words:["open","secret","hand","shake"], clues:[
+      "not shut","mystery","body part","greeting"]},
+    {words:["storm","front","page","number"], clues:[
+      "tempest","leading edge","newspaper leaf","numeral"]},
+    {words:["cheap","trick","shot","glass"], clues:[
+      "low-cost","ruse","attempt","vessel"]},
+    {words:["garden","path","story","twist"], clues:[
+      "yard plot","walkway","tale","turn"]}
   ];
 
-  // Utilities
-  const A_CODE = 'a'.charCodeAt(0);
-  const vowels = new Set(['a','e','i','o','u']);
-
-  function sanitize(w){
-    return (w||"").toLowerCase().replace(/[^a-z]/g,"");
-  }
-  function sumLetters(w){
-    let s=0;
-    for (let i=0;i<w.length;i++){
-      s += (w.charCodeAt(i)-A_CODE+1);
-    }
-    return s;
-  }
-  function vowelCount(w){
-    let c=0;
-    for (let i=0;i<w.length;i++){
-      if (vowels.has(w[i])) c++;
-    }
-    return c;
-  }
-  function minLetterVal(w){
-    if (!w) return 0;
-    let m=26;
-    for (let i=0;i<w.length;i++){
-      const v = w.charCodeAt(i)-A_CODE+1;
-      if (v<m) m=v;
-    }
-    return m;
-  }
-  function maxLetterVal(w){
-    if (!w) return 0;
-    let m=1;
-    for (let i=0;i<w.length;i++){
-      const v = w.charCodeAt(i)-A_CODE+1;
-      if (v>m) m=v;
-    }
-    return m;
-  }
-  function toLetter(n){
-    return String.fromCharCode(A_CODE + (n-1));
-  }
-
-  // Deterministic "day" index (UTC)
-  function dayNumberUTC(){
-    const start = Date.UTC(2024,0,1);
+  // Deterministic daily selection (UTC days since 2024-01-01)
+  function dayIndexUTC(){
     const now = new Date();
     const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-    const diffDays = Math.floor((todayUTC - start)/86400000);
-    return Math.max(0,diffDays);
+    const epochUTC = Date.UTC(2024,0,1);
+    return Math.floor((todayUTC - epochUTC) / 86400000);
   }
+  const dayIndex = dayIndexUTC();
+  const puzzleIndex = ((dayIndex % PUZZLES.length)+PUZZLES.length)%PUZZLES.length;
+  const puzzleNum = dayIndex + 1; // overall counting
+  const puzzle = PUZZLES[puzzleIndex];
+  const WORDS = puzzle.words.slice();
+  const STREAM = WORDS.join("").toUpperCase();
+  const TARGET = WORDS.map(w=>w.toUpperCase());
 
-  const dayNo = dayNumberUTC();
-  const target = targets[dayNo % targets.length];
-  const targetMetrics = {
-    len: target.length,
-    sum: sumLetters(target),
-    vow: vowelCount(target),
-    min: minLetterVal(target),
-    max: maxLetterVal(target)
-  };
-
-  // DOM
-  const rowsEl = document.getElementById('rows');
-  const inputEl = document.getElementById('guessInput');
-  const guessBtn = document.getElementById('guessBtn');
-  const giveUpBtn = document.getElementById('giveUpBtn');
-  const msgEl = document.getElementById('msg');
+  // Elements
+  const streamEl = document.getElementById('stream');
+  const seglistEl = document.getElementById('seglist');
+  const cluelistEl = document.getElementById('cluelist');
+  const statusEl = document.getElementById('status');
+  const checkBtn = document.getElementById('checkBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const hintBtn = document.getElementById('hintBtn');
+  const giveBtn = document.getElementById('giveBtn');
   const winEl = document.getElementById('win');
-  const dayLabel = document.getElementById('dayLabel');
-  const dateUTCEl = document.getElementById('dateUTC');
-  const puzzleNoEl = document.getElementById('puzzleNo');
-  const lenHintEl = document.getElementById('lenHint');
-  const copyBtn = document.getElementById('copyBtn');
-  const copiedEl = document.getElementById('copied');
+  const dateLine = document.getElementById('dateLine');
+  const puzzleId = document.getElementById('puzzleId');
 
-  // Populate header info
+  // Header info
   const now = new Date();
-  const isoDate = `${now.getUTCFullYear()}-${String(now.getUTCMonth()+1).padStart(2,'0')}-${String(now.getUTCDate()).padStart(2,'0')}`;
-  dayLabel.textContent = `Daily • ${isoDate}`;
-  dateUTCEl.textContent = isoDate + " (UTC)";
-  puzzleNoEl.textContent = dayNo.toString();
-  lenHintEl.textContent = target.length.toString();
+  dateLine.textContent = now.toLocaleDateString(undefined,{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+  puzzleId.textContent = `Daily #${puzzleNum}  •  Set ${puzzleIndex+1}/${PUZZLES.length}`;
 
-  // State
-  let finished = false;
-  let history = []; // array of {word, m:{len,sum,vow,min,max}, arrows:{...}}
-
-  // Storage key per day
-  const storeKey = `gw_${isoDate}`;
-  // Load previous (if any)
-  try{
-    const saved = JSON.parse(localStorage.getItem(storeKey) || "null");
-    if (saved && saved.t===target && Array.isArray(saved.h)){
-      history = saved.h;
-      finished = !!saved.fin;
-      renderAll();
-      if (finished) onFinish(saved.winMsg||null);
-    }
-  }catch(e){/* ignore */}
-
-  function save(){
-    try{
-      localStorage.setItem(storeKey, JSON.stringify({t:target, h:history, fin:finished, winMsg:winEl.textContent||""}));
-    }catch(e){/* ignore */}
-  }
-
-  function compareArrow(a,b){
-    if (a<b) return 'up';     // need higher
-    if (a>b) return 'down';   // need lower
-    return 'eq';              // matched
-  }
-
-  function renderRow(entry){
-    const tr = document.createElement('tr');
-    const tdGuess = document.createElement('td');
-    tdGuess.className = 'guess';
-    tdGuess.textContent = entry.word;
-    tr.appendChild(tdGuess);
-
-    const cols = ['len','sum','vow','min','max'];
-    cols.forEach(k=>{
-      const td = document.createElement('td');
-      const wrap = document.createElement('div');
-      wrap.className = 'cell';
-      const arrow = document.createElement('div');
-      arrow.className = 'arrow ' + entry.arrows[k];
-      arrow.textContent = entry.arrows[k]==='up'?'▲':entry.arrows[k]==='down'?'▼':'●';
-      const val = document.createElement('div');
-      val.className = 'val';
-      if (k==='min' || k==='max'){
-        val.textContent = toLetter(entry.m[k]);
-      }else{
-        val.textContent = entry.m[k];
-      }
-      wrap.appendChild(arrow);
-      wrap.appendChild(val);
-      td.appendChild(wrap);
-      tr.appendChild(td);
+  // Build clue cards
+  function renderClues(showLengths){
+    cluelistEl.innerHTML = "";
+    puzzle.clues.forEach((txt,i)=>{
+      const d = document.createElement('div');
+      d.className = 'clue';
+      const n = document.createElement('div'); n.className = 'num'; n.textContent = `Clue ${i+1}`;
+      const t = document.createElement('div'); t.className = 'txt'; t.textContent = txt;
+      const len = document.createElement('div'); len.className = 'length'; len.textContent = `(${WORDS[i].length})`;
+      if(showLengths) len.style.display = 'inline';
+      t.appendChild(len);
+      d.appendChild(n); d.appendChild(t);
+      cluelistEl.appendChild(d);
     });
-
-    rowsEl.appendChild(tr);
+    if(showLengths) cluelistEl.parentElement.parentElement.classList.add('hinted');
   }
 
-  function renderAll(){
-    rowsEl.innerHTML = '';
-    history.forEach(renderRow);
-  }
-
-  function feedbackFor(word){
-    const m = {
-      len: word.length,
-      sum: sumLetters(word),
-      vow: vowelCount(word),
-      min: minLetterVal(word),
-      max: maxLetterVal(word)
-    };
-    return {
-      word,
-      m,
-      arrows: {
-        len: compareArrow(m.len, targetMetrics.len),
-        sum: compareArrow(m.sum, targetMetrics.sum),
-        vow: compareArrow(m.vow, targetMetrics.vow),
-        min: compareArrow(m.min, targetMetrics.min),
-        max: compareArrow(m.max, targetMetrics.max)
+  // Build stream cells and gaps
+  const cuts = new Set(); // cut after index i (0..n-2)
+  function buildStream(){
+    streamEl.innerHTML = "";
+    for(let i=0;i<STREAM.length;i++){
+      const c = document.createElement('div');
+      c.className = 'cell';
+      c.textContent = STREAM[i];
+      streamEl.appendChild(c);
+      if(i<STREAM.length-1){
+        const g = document.createElement('div');
+        g.className = 'gap';
+        g.setAttribute('role','button');
+        g.setAttribute('aria-label','Toggle cut');
+        g.dataset.idx = i.toString();
+        if(cuts.has(i)) g.classList.add('cut');
+        g.addEventListener('click', onGapClick);
+        streamEl.appendChild(g);
       }
-    };
+    }
   }
 
-  function setMsg(text, ok=false){
-    msgEl.textContent = text || '';
-    msgEl.style.color = ok ? 'var(--good)' : 'var(--muted)';
-  }
-
-  function onFinish(customMsg){
-    finished = true;
-    inputEl.disabled = true;
-    guessBtn.disabled = true;
-    giveUpBtn.disabled = true;
-    winEl.classList.add('show');
-    if (!customMsg){
-      winEl.textContent = `You found it in ${history.length} ${history.length===1?'guess':'guesses'}! The word was “${target.toUpperCase()}”.`;
+  function onGapClick(e){
+    const idx = parseInt(e.currentTarget.dataset.idx,10);
+    if(cuts.has(idx)){
+      cuts.delete(idx);
+      e.currentTarget.classList.remove('cut');
+      e.currentTarget.classList.remove('lock');
+      setStatus(`Cut removed (${cuts.size}/3).`);
     }else{
-      winEl.textContent = customMsg;
+      if(cuts.size>=3){
+        // brief lock flash
+        e.currentTarget.classList.add('lock');
+        setStatus("Only 3 cuts allowed.");
+        setTimeout(()=>e.currentTarget.classList.remove('lock'),180);
+        return;
+      }
+      cuts.add(idx);
+      e.currentTarget.classList.add('cut');
+      setStatus(`Cut placed (${cuts.size}/3).`);
+    }
+    renderSegments();
+    checkWin(false);
+  }
+
+  function currentSegments(){
+    const n = STREAM.length;
+    const sorted = Array.from(cuts).sort((a,b)=>a-b);
+    const bounds = [0, ...sorted.map(x=>x+1), n];
+    const segs = [];
+    for(let i=0;i<bounds.length-1;i++){
+      const s = STREAM.slice(bounds[i], bounds[i+1]);
+      if(s.length) segs.push(s);
+    }
+    return segs;
+  }
+
+  function renderSegments(){
+    const segs = currentSegments();
+    seglistEl.innerHTML = "";
+    for(let i=0;i<4;i++){
+      const div = document.createElement('div');
+      div.className = 'seg';
+      const s = segs[i]||"";
+      if(!s){
+        div.classList.add('empty');
+        div.textContent = '…';
+      }else{
+        div.textContent = s;
+        if(TARGET[i]===s){
+          div.classList.add('ok');
+        }else{
+          div.classList.add('wait');
+        }
+      }
+      seglistEl.appendChild(div);
     }
   }
 
-  function submit(){
-    if (finished) return;
-    let w = sanitize(inputEl.value);
-    if (!w){
-      setMsg('Type 4–7 letters to guess.');
-      return;
-    }
-    if (w.length < 4 || w.length > 7){
-      setMsg('Word must be 4–7 letters.');
-      return;
-    }
-    const entry = feedbackFor(w);
-    history.push(entry);
-    renderRow(entry);
-    inputEl.value = '';
-    setMsg('');
-    if (w === target){
-      onFinish();
-    }
-    save();
+  function setStatus(msg){
+    statusEl.innerHTML = msg;
   }
 
-  function reveal(){
-    if (finished) return;
-    onFinish(`Revealed. The word was “${target.toUpperCase()}”. Try again tomorrow!`);
-    save();
+  function checkWin(fromButton){
+    const segs = currentSegments();
+    let ok = segs.length===4 && segs.every((s,i)=>s===TARGET[i]);
+    if(ok){
+      winEl.classList.add('show');
+      setStatus(`<strong>Win!</strong> ${WORDS.map(w=>w.toUpperCase()).join(" • ")}`);
+      // freeze interactions
+      document.querySelectorAll('.gap').forEach(g=>g.style.pointerEvents='none');
+      return true;
+    }else{
+      if(fromButton){
+        if(segs.length<4){
+          setStatus(`Not yet. You need ${4-segs.length} more segment${4-segs.length===1?"":"s"}.`);
+        }else{
+          let count = 0;
+          for(let i=0;i<4;i++) if(segs[i]===TARGET[i]) count++;
+          setStatus(`Keep slicing: ${count}/4 segments correct.`);
+        }
+      }
+      return false;
+    }
   }
 
-  function buildShare(){
-    const header = `GaugeWord ${isoDate} • #${dayNo}`;
-    const outcome = finished && history.length>0 && history[history.length-1].word===target
-      ? `Solved in ${history.length}`
-      : `Unsolved (${history.length})`;
-    const rows = history.map(e=>{
-      const cols = ['len','sum','vow','min','max'].map(k=>{
-        const a = e.arrows[k];
-        return a==='eq'?'●':(a==='up'?'▲':'▼');
-      }).join('');
-      return cols;
-    });
-    return `${header}\n${outcome}\n${rows.join('\n')}`;
-  }
-
-  // Events
-  guessBtn.addEventListener('click', submit);
-  giveUpBtn.addEventListener('click', reveal);
-  inputEl.addEventListener('keydown', (e)=>{
-    if (e.key === 'Enter') submit();
+  // Buttons
+  checkBtn.addEventListener('click', ()=>{ renderSegments(); checkWin(true); });
+  resetBtn.addEventListener('click', ()=>{
+    cuts.clear();
+    buildStream();
+    renderSegments();
+    winEl.classList.remove('show');
+    setStatus("Cuts cleared. Place 3 cuts to make 4 words.");
   });
-  inputEl.addEventListener('input', ()=>{
-    // live constraint: letters only
-    const cur = inputEl.value;
-    const cleaned = cur.replace(/[^a-zA-Z]/g,'');
-    if (cur !== cleaned) inputEl.value = cleaned;
+  let hinted = false;
+  hintBtn.addEventListener('click', ()=>{
+    hinted = true;
+    renderClues(true);
+    setStatus("Lengths revealed.");
   });
-  copyBtn.addEventListener('click', async ()=>{
-    const text = buildShare();
-    try{
-      await navigator.clipboard.writeText(text);
-      copiedEl.style.display = 'inline';
-      setTimeout(()=>copiedEl.style.display='none', 1200);
-    }catch(e){
-      // fallback
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      copiedEl.style.display = 'inline';
-      setTimeout(()=>copiedEl.style.display='none', 1200);
+  giveBtn.addEventListener('click', ()=>{
+    // Place cuts at the true boundaries
+    cuts.clear();
+    let pos = 0;
+    for(let i=0;i<WORDS.length-1;i++){
+      pos += WORDS[i].length - 1; // index after which to cut
+      cuts.add(pos);
+      pos += 1; // move to next start
     }
+    // Recompute: simpler method: rebuild by adding cumulative.
+    cuts.clear();
+    let acc = 0;
+    for(let i=0;i<WORDS.length-1;i++){
+      acc += WORDS[i].length;
+      cuts.add(acc-1);
+    }
+    buildStream();
+    renderSegments();
+    checkWin(false);
+    setStatus("Solution shown.");
   });
 
-  // Autofocus
-  setTimeout(()=>inputEl.focus(), 60);
+  // Initial render
+  renderClues(false);
+  buildStream();
+  renderSegments();
 })();
 </script>
 </body>

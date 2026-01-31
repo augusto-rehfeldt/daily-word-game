@@ -1,467 +1,486 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=1200, initial-scale=1">
-<title>Offset Duo — Daily Word Link</title>
+<meta charset="UTF-8">
+<title>GaugeWord — Daily</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root{
-    --bg:#0f1116;
-    --panel:#161925;
-    --ink:#e7e9f1;
-    --muted:#9aa3b2;
-    --accent:#5ad1a6;
-    --warn:#f39c57;
-    --bad:#f05d6c;
-    --ok:#4cc3ff;
-    --chip:#202433;
-    --line:#23283a;
+    --bg:#0f1320;
+    --panel:#171d2e;
+    --ink:#e9eef6;
+    --muted:#9fb0c8;
+    --accent:#5dd0ff;
+    --good:#5de094;
+    --warn:#ffd166;
+    --bad:#ff6b6b;
+    --chip:#22283a;
   }
-  html,body{height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,Segoe UI,Arial,sans-serif;margin:0}
-  .wrap{max-width:980px;margin:0 auto;padding:18px 18px 0}
-  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-  header h1{font-size:22px;margin:0;font-weight:700;letter-spacing:.5px}
-  header .sub{font-size:12px;color:var(--muted)}
-  .board{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
-  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .chips{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{background:var(--chip);border:1px solid var(--line);color:var(--ink);padding:4px 8px;border-radius:999px;font-size:12px;letter-spacing:.2px}
-  .pill{background:transparent;border:1px dashed var(--line);color:var(--muted);padding:4px 8px;border-radius:999px;font-size:12px}
-  .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
-  .clue{font-size:15px;line-height:1.3}
-  .grid{display:grid;grid-template-columns:repeat(5,38px);gap:6px}
-  .cell{height:42px;width:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#1a1f2f;border:1px solid var(--line);font-weight:700;font-size:20px;letter-spacing:1px}
-  .cell.muted{color:#6b7383}
-  .io{display:flex;align-items:center;gap:10px}
-  input[type=text]{height:44px;width:230px;border-radius:9px;border:1px solid var(--line);background:#121622;color:var(--ink);font-size:20px;letter-spacing:2px;text-transform:uppercase;text-align:center;outline:none}
-  input[type=text]::placeholder{color:#556078}
-  button{height:44px;padding:0 14px;border-radius:9px;border:1px solid var(--line);background:#1a2030;color:var(--ink);font-weight:600;cursor:pointer}
-  button.primary{background:var(--accent);border-color:#3dbd93;color:#062b20}
-  button.ghost{background:transparent;color:var(--muted)}
-  button:disabled{opacity:.6;cursor:not-allowed}
-  .hint{font-size:12px;color:var(--muted)}
-  .flex{display:flex;align-items:center;justify-content:space-between}
-  .sep{height:1px;background:var(--line);margin:10px 0}
-  .status{display:flex;gap:8px;align-items:center}
-  .tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:#1a2030}
-  .tag.ok{background:#122a21;color:#a5f0d2;border-color:#224e3e}
-  .tag.bad{background:#2a1518;color:#ffb7bf;border-color:#4c2a2e}
-  .tag.info{background:#102636;color:#aee4ff;border-color:#224a63}
-  .history{max-height:220px;overflow:auto}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  td,th{padding:6px;border-bottom:1px solid var(--line);text-align:left}
-  .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;letter-spacing:.8px}
-  .win{border:1px solid #2f6b56;background:#122a21;color:#a5f0d2;border-radius:10px;padding:10px}
-  footer{margin-top:10px;color:var(--muted);font-size:12px}
-  @media (max-height:900px){
-    .history{max-height:160px}
-    .grid{grid-template-columns:repeat(5,34px)}
-    .cell{height:38px;width:34px;font-size:18px}
-    input[type=text]{height:40px;font-size:18px}
-    button{height:40px}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial,sans-serif}
+  .wrap{
+    max-width:1100px;
+    margin:0 auto;
+    padding:16px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    height:100vh;
   }
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 14px;border-radius:10px;background:var(--panel);
+  }
+  .title{
+    display:flex;align-items:baseline;gap:10px;
+  }
+  h1{font-size:22px;margin:0;letter-spacing:.5px}
+  .day{
+    font-size:13px;color:var(--muted);padding:2px 8px;border-radius:999px;background:var(--chip)}
+  .legend{
+    display:flex;gap:14px;align-items:center;
+    font-size:13px;color:var(--muted)
+  }
+  .legend b{color:var(--ink);font-weight:600}
+  .legend .pill{display:inline-flex;align-items:center;gap:6px;background:var(--chip);padding:6px 8px;border-radius:8px}
+  .legend .arrow{font-weight:700}
+  main{
+    display:grid;grid-template-columns:1.2fr .8fr;gap:12px;min-height:0; /* allow inner scroll */
+  }
+  .panel{background:var(--panel);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:0}
+  .rules ul{margin:6px 0 0 18px;padding:0}
+  .rules li{margin:6px 0;color:var(--muted);font-size:14px}
+  .metrics-head{
+    display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)
+  }
+  .metrics-head .badge{padding:3px 8px;border-radius:6px;background:var(--chip);color:var(--ink);font-weight:600}
+  .inputRow{
+    display:flex;gap:8px;align-items:center
+  }
+  input[type=text]{
+    flex:1;border:1px solid transparent;background:var(--chip);color:var(--ink);
+    padding:10px 12px;border-radius:8px;font-size:16px;outline:none;
+  }
+  input[type=text]::placeholder{color:#7c8aa5}
+  button{
+    background:var(--accent);color:#001018;border:none;border-radius:8px;
+    padding:10px 12px;font-weight:700;font-size:14px;cursor:pointer;
+  }
+  button.secondary{
+    background:transparent;border:1px solid #2a3248;color:var(--muted)
+  }
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .msg{min-height:20px;font-size:13px;color:var(--muted)}
+  .board{
+    background:rgba(255,255,255,0.02);
+    border:1px solid #20263a;border-radius:8px;overflow:auto;min-height:0;flex:1
+  }
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  thead th{
+    position:sticky;top:0;background:#1a2135;border-bottom:1px solid #2a3248;
+    font-size:12px;color:var(--muted);padding:8px 6px
+  }
+  tbody td{padding:8px 6px;border-bottom:1px dashed #212840;font-size:15px}
+  tbody tr:last-child td{border-bottom:none}
+  .guess{font-weight:800;letter-spacing:.6px}
+  .cell{
+    display:flex;align-items:center;justify-content:center;gap:6px
+  }
+  .val{font-weight:700}
+  .arrow{width:22px;text-align:center;font-weight:900}
+  .up{color:var(--warn)}
+  .down{color:var(--bad)}
+  .eq{color:var(--good)}
+  .footer{
+    display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:13px
+  }
+  .win{
+    background:linear-gradient(90deg,#1f2b44,transparent);
+    border:1px solid #2e3b59;color:#bff3cb;padding:8px 10px;border-radius:8px;
+    font-weight:700;display:none
+  }
+  .win.show{display:block}
+  .share{
+    display:flex;gap:8px;align-items:center
+  }
+  .tiny{font-size:12px;color:var(--muted)}
+  .sp{height:6px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div>
-      <h1>Offset Duo — Daily</h1>
-      <div class="sub" id="dailyMeta"></div>
+    <div class="title">
+      <h1>GaugeWord</h1>
+      <span class="day" id="dayLabel">Daily</span>
     </div>
-    <div class="chips" id="metaChips"></div>
+    <div class="legend">
+      <span class="pill"><span class="arrow up">▲</span> you need higher</span>
+      <span class="pill"><span class="arrow down">▼</span> you need lower</span>
+      <span class="pill"><span class="arrow eq">●</span> matched</span>
+    </div>
   </header>
-
-  <div class="board">
-    <div class="card">
-      <div class="label">Clue A</div>
-      <div id="clueA" class="clue"></div>
-      <div class="sep"></div>
-      <div class="label">Type A (letters only)</div>
-      <div class="io">
-        <input id="guess" type="text" autocomplete="off" spellcheck="false" placeholder="Enter word" maxlength="5">
-        <button id="checkBtn" class="primary">Check</button>
-        <button id="clearBtn">Clear</button>
+  <main>
+    <section class="panel">
+      <div class="metrics-head">
+        <span class="badge">Rules</span>
       </div>
-      <div class="hint" id="hintA"></div>
-      <div class="sep"></div>
-      <div class="label">A you typed</div>
-      <div class="grid" id="gridA"></div>
-    </div>
-
-    <div class="card">
-      <div class="label">Clue B</div>
-      <div id="clueB" class="clue"></div>
-      <div class="sep"></div>
-      <div class="label">Per-position offsets (A → B)</div>
-      <div class="chips" id="offsetChips"></div>
-      <div class="hint">Letters wrap A↔Z. Example: Z + 2 → B</div>
-      <div class="sep"></div>
-      <div class="label">Partner generated from A</div>
-      <div class="grid" id="gridB"></div>
-    </div>
-  </div>
-
-  <div class="card" style="margin-top:12px">
-    <div class="flex">
-      <div class="status" id="status">
-        <span class="tag info">Enter a word for Clue A, then Check.</span>
+      <div class="rules">
+        <ul>
+          <li>Guess any 4–7 letter English word. Press Enter or Guess.</li>
+          <li>After each guess, five gauges compare your word to today’s secret:</li>
+          <li style="list-style:none;margin-left:0">
+            <div class="legend">
+              <span class="pill"><b>Len</b> letters</span>
+              <span class="pill"><b>Sum</b> A1–Z26 total</span>
+              <span class="pill"><b>Vow</b> number of vowels (A,E,I,O,U)</span>
+              <span class="pill"><b>Min</b> earliest letter in your word</span>
+              <span class="pill"><b>Max</b> latest letter in your word</span>
+            </div>
+          </li>
+          <li>Arrows show direction: ▲ need higher, ▼ need lower, ● exact match.</li>
+          <li>Find the exact secret word to win. One new puzzle daily (UTC).</li>
+        </ul>
       </div>
-      <div class="row">
-        <button id="hintBtn" class="ghost">Hint: reveal first letter</button>
-        <button id="shareBtn" class="ghost" disabled>Share</button>
+      <div class="sp"></div>
+      <div class="metrics-head">
+        <span class="badge">Make a guess</span>
       </div>
-    </div>
-    <div class="sep"></div>
-    <div class="label">Attempts</div>
-    <div class="history">
-      <table>
-        <thead>
-          <tr><th>#</th><th class="mono">A</th><th></th><th class="mono">B (A→B)</th><th>Result</th></tr>
-        </thead>
-        <tbody id="log"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <footer>
-    Rules: Two words are linked by fixed alphabet offsets. Enter a word for Clue A. Each letter is shifted by the shown offsets (wrap after Z) to produce a partner word. If that partner exactly answers Clue B, you win. One daily puzzle, resets at 00:00 UTC.
-  </footer>
+      <div class="inputRow">
+        <input id="guessInput" type="text" placeholder="type a word..." autocomplete="off" maxlength="12" />
+        <button id="guessBtn">Guess</button>
+        <button id="giveUpBtn" class="secondary">Reveal</button>
+      </div>
+      <div class="msg" id="msg"></div>
+      <div id="win" class="win"></div>
+      <div class="sp"></div>
+      <div class="metrics-head">
+        <span class="badge">History</span>
+        <span class="tiny">(values shown for your guesses; target stays hidden)</span>
+      </div>
+      <div class="board">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left;width:30%">Guess</th>
+              <th>Len</th>
+              <th>Sum</th>
+              <th>Vow</th>
+              <th>Min</th>
+              <th>Max</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="footer">
+        <div class="share">
+          <button id="copyBtn" class="secondary">Copy result</button>
+          <span id="copied" class="tiny" style="display:none">Copied!</span>
+        </div>
+        <div class="tiny">Tip: non‑words are accepted, but real words help more.</div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="metrics-head"><span class="badge">Today</span></div>
+      <div style="display:grid;grid-template-columns:1fr;gap:10px;font-size:14px;color:var(--muted)">
+        <div><b>Date (UTC):</b> <span id="dateUTC"></span></div>
+        <div><b>Puzzle #:</b> <span id="puzzleNo"></span></div>
+        <div><b>Target length:</b> <span id="lenHint">—</span></div>
+        <div class="tiny">Length is revealed so you can play compactly.</div>
+      </div>
+      <div class="sp"></div>
+      <div class="metrics-head"><span class="badge">Legend</span></div>
+      <div style="display:grid;gap:8px;color:var(--muted);font-size:14px">
+        <div>• Len: If you see ▲, the secret word has more letters than your guess. ▼ means fewer letters.</div>
+        <div>• Sum: Add A=1, B=2, …, Z=26 for each letter. ▲ means the secret’s total is higher.</div>
+        <div>• Vow: Counts only A, E, I, O, U as vowels.</div>
+        <div>• Min / Max: The earliest/latest letter in your word (alphabetically). ▲ means the secret’s letter is later in the alphabet; ▼ means earlier.</div>
+      </div>
+    </section>
+  </main>
 </div>
 
 <script>
 (function(){
-  const pairs = [
-    {a:"PLANT", b:"GROVE", aClue:"Green and rooted organism", bClue:"Small group of trees"},
-    {a:"BREAD", b:"TOAST", aClue:"Loaf dough once baked", bClue:"Crisped slice"},
-    {a:"ANGEL", b:"DEVIL", aClue:"Winged guardian", bClue:"Tempter in tales"},
-    {a:"HAPPY", b:"MERRY", aClue:"Feeling glad", bClue:"Festive and cheerful"},
-    {a:"EARTH", b:"WORLD", aClue:"Our planet", bClue:"The globe"},
-    {a:"FROGS", b:"TOADS", aClue:"Jumping pond amphibians", bClue:"Warty amphibians"},
-    {a:"MUSIC", b:"SONGS", aClue:"Organized sound", bClue:"Tunes"},
-    {a:"NORTH", b:"SOUTH", aClue:"Up on most maps", bClue:"Down on most maps"},
-    {a:"ALERT", b:"AWARE", aClue:"Vigilant", bClue:"Conscious of"},
-    {a:"RIGHT", b:"WRONG", aClue:"Correct", bClue:"Incorrect"},
-    {a:"METAL", b:"STEEL", aClue:"Shiny hard material", bClue:"Strong iron alloy"},
-    {a:"HEART", b:"CHEST", aClue:"Organ that beats", bClue:"Thoracic area"},
-    {a:"TABLE", b:"CHAIR", aClue:"Flat-topped furniture", bClue:"Seat with a back"},
-    {a:"APPLE", b:"FRUIT", aClue:"Crunchy orchard fruit", bClue:"Edible plant category"},
-    {a:"NOISE", b:"SOUND", aClue:"Unwanted sound", bClue:"Audible vibration"},
-    {a:"WATER", b:"STEAM", aClue:"Liquid essential to life", bClue:"Vapor from boiling"},
-    {a:"STONE", b:"ROCKS", aClue:"Hard mineral piece", bClue:"Stones, informally"},
-    {a:"BRICK", b:"STONE", aClue:"Rectangular clay block", bClue:"Hard natural building piece"},
-    {a:"TEACH", b:"LEARN", aClue:"Instruct", bClue:"Acquire knowledge"},
-    {a:"CLOUD", b:"SKIES", aClue:"Puffy sky thing", bClue:"Overhead expanses"},
-    {a:"SWEET", b:"SUGAR", aClue:"Sugary to the taste", bClue:"Granulated sweetener"},
-    {a:"BRUSH", b:"PAINT", aClue:"Bristled tool", bClue:"Colored coating"},
-    {a:"GREEN", b:"PLANT", aClue:"Color of spring", bClue:"Photosynthesizing organism"},
-    {a:"SMOKE", b:"VAPOR", aClue:"What rises from fire", bClue:"Gas-like mist"},
-    {a:"RIVER", b:"WATER", aClue:"Natural flowing stream", bClue:"H2O"},
-    {a:"NIGHT", b:"DREAM", aClue:"Dark time", bClue:"Sleep vision"},
-    {a:"GIANT", b:"TITAN", aClue:"Very large person", bClue:"Powerful being"},
-    {a:"STARS", b:"SPACE", aClue:"Night twinkles", bClue:"Outer void"},
-    {a:"BLADE", b:"KNIFE", aClue:"Cutting edge", bClue:"Sharp utensil"},
-    {a:"FLORA", b:"FAUNA", aClue:"Plant life of a region", bClue:"Animal life of a region"},
-    {a:"PAPER", b:"PAGES", aClue:"Writing sheet", bClue:"Leaves of a book"},
-    {a:"WHEAT", b:"GRAIN", aClue:"Cereal crop", bClue:"Edible seed"},
-    {a:"HORSE", b:"RIDER", aClue:"Animal for riding", bClue:"One who mounts"},
-    {a:"SPICE", b:"HERBS", aClue:"Aromatic seasoning", bClue:"Leafy flavorings"},
-    {a:"MAPLE", b:"TREES", aClue:"Tree with sweet sap", bClue:"Wooded plants"},
-    {a:"TIGER", b:"LIONS", aClue:"Striped big cat", bClue:"Pride-forming big cats"}
+  // Small curated list of target words (4–7 letters), deterministic by day (UTC)
+  const targets = [
+    "apple","bridge","chair","dance","eagle","forge","grain","honey","ivory","jelly","kneel","lemon","magic","night","ocean",
+    "pearl","queen","river","sugar","tidal","unity","vivid","woven","xenon","young","zebra","amber","blush","cabin","daisy",
+    "ember","fable","globe","harbor","inlet","jolly","karma","linen","meadow","novel","olive","piano","quilt","raven","sunny",
+    "thick","umbra","vigor","waltz","yeast","azure","briar","cider","drape","flock","gazer","hinge","irony","joist","knead",
+    "latch","mirth","nylon","ochre","prism","quark","riser","sleet","truce","udder","vowel","wafer","yodel","adore","banjo",
+    "cello","delta","ether","frost","giddy","hatch","icing","jaunt","koala","lumen","mango","noble","opine","petal","quill",
+    "reign","savor","trout","urban","valor","wharf","yacht","aspic","blaze","clang","droll","enact","femur","graft","humor",
+    "ingot","jumpy","knack","lapel","mossy","nudge","ovoid","pithy","quirk","rouse","shard","table","ultra","vixen","wrath",
+    "yearn","zesty","align","brisk","creed","dodge","elate","flint","grail","heist","idiom","joust","kiosk","lithe","mince",
+    "nurse","overt","proud","rhyme","scout","thrum","unite","vapor","wryly","aider","bough","croak"
   ];
 
-  // Daily index based on UTC date; optional override via hash #n
-  function dayIndexUTC(){
-    const now = new Date();
-    const utcMid = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-    const epoch = Date.UTC(2024,0,1);
-    const days = Math.floor((utcMid - epoch)/86400000);
-    return ((days % pairs.length)+pairs.length)%pairs.length;
+  // Utilities
+  const A_CODE = 'a'.charCodeAt(0);
+  const vowels = new Set(['a','e','i','o','u']);
+
+  function sanitize(w){
+    return (w||"").toLowerCase().replace(/[^a-z]/g,"");
   }
-  function getIndexFromHash(){
-    const m = location.hash.match(/#(\d{1,3})/);
-    if(!m) return null;
-    const n = parseInt(m[1],10);
-    if(isFinite(n)) return ((n % pairs.length)+pairs.length)%pairs.length;
-    return null;
+  function sumLetters(w){
+    let s=0;
+    for (let i=0;i<w.length;i++){
+      s += (w.charCodeAt(i)-A_CODE+1);
+    }
+    return s;
   }
-
-  const idx = getIndexFromHash() ?? dayIndexUTC();
-  const dailyNumber = (function(){
-    // Stable public-facing counter since 2024-01-01 UTC
-    const now = new Date();
-    const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-    const epoch = Date.UTC(2024,0,1);
-    return Math.floor((today - epoch)/86400000) + 1;
-  })();
-
-  const puzzle = pairs[idx];
-  const L = puzzle.a.length; // always 5 here
-  const offsets = getOffsets(puzzle.a, puzzle.b);
-
-  // DOM refs
-  const meta = document.getElementById('dailyMeta');
-  const metaChips = document.getElementById('metaChips');
-  const clueA = document.getElementById('clueA');
-  const clueB = document.getElementById('clueB');
-  const offsetChips = document.getElementById('offsetChips');
-  const gridA = document.getElementById('gridA');
-  const gridB = document.getElementById('gridB');
-  const guessInput = document.getElementById('guess');
-  const checkBtn = document.getElementById('checkBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const status = document.getElementById('status');
-  const logBody = document.getElementById('log');
-  const hintBtn = document.getElementById('hintBtn');
-  const hintA = document.getElementById('hintA');
-  const shareBtn = document.getElementById('shareBtn');
-
-  // Setup meta
-  meta.textContent = `Daily #${dailyNumber} • Word length ${L} • Resets 00:00 UTC`;
-  const m1 = chip(`Pair ${idx+1}/${pairs.length}`);
-  const m2 = chip(`A→B locked`);
-  metaChips.appendChild(m1);
-  metaChips.appendChild(m2);
-
-  // Clues
-  clueA.textContent = puzzle.aClue;
-  clueB.textContent = puzzle.bClue;
-
-  // Offsets UI
-  offsets.forEach(n=>{
-    const c = document.createElement('div');
-    c.className = 'chip';
-    c.textContent = `+${n}`;
-    offsetChips.appendChild(c);
-  });
-
-  // Grids
-  makeGrid(gridA, L);
-  makeGrid(gridB, L);
-
-  // Input behavior
-  guessInput.maxLength = L;
-  guessInput.addEventListener('input', onType);
-  guessInput.addEventListener('keydown', e=>{
-    if(e.key === 'Enter'){ e.preventDefault(); submit(); }
-  });
-  checkBtn.addEventListener('click', submit);
-  clearBtn.addEventListener('click', ()=>{
-    guessInput.value = '';
-    refreshGrids('');
-    focusInput();
-  });
-
-  // Hint
-  let hinted = false;
-  hintBtn.addEventListener('click', ()=>{
-    if(hinted) return;
-    hinted = true;
-    hintBtn.disabled = true;
-    const first = puzzle.a[0];
-    const current = guessInput.value.toUpperCase().replace(/[^A-Z]/g,'');
-    const withFirst = (first + current.slice(1)).slice(0,L);
-    guessInput.value = withFirst;
-    hintA.textContent = `Hint used: A starts with “${first}”.`;
-    refreshGrids(withFirst);
-    pushStatus('info', `First letter of A revealed.`);
-  });
-
-  // Share
-  shareBtn.addEventListener('click', shareResult);
-
-  // Initialize
-  refreshGrids('');
-  focusInput();
-  pushStatus('info', 'Tip: You can see B update live as you type A.');
-
-  // Functions
-  function chip(text){
-    const c = document.createElement('div');
-    c.className = 'chip';
-    c.textContent = text;
+  function vowelCount(w){
+    let c=0;
+    for (let i=0;i<w.length;i++){
+      if (vowels.has(w[i])) c++;
+    }
     return c;
   }
-
-  function makeGrid(root, n){
-    root.innerHTML = '';
-    for(let i=0;i<n;i++){
-      const d = document.createElement('div');
-      d.className = 'cell muted';
-      d.textContent = '·';
-      root.appendChild(d);
+  function minLetterVal(w){
+    if (!w) return 0;
+    let m=26;
+    for (let i=0;i<w.length;i++){
+      const v = w.charCodeAt(i)-A_CODE+1;
+      if (v<m) m=v;
     }
+    return m;
+  }
+  function maxLetterVal(w){
+    if (!w) return 0;
+    let m=1;
+    for (let i=0;i<w.length;i++){
+      const v = w.charCodeAt(i)-A_CODE+1;
+      if (v>m) m=v;
+    }
+    return m;
+  }
+  function toLetter(n){
+    return String.fromCharCode(A_CODE + (n-1));
   }
 
-  function setGridLetters(root, s){
-    const cells = root.querySelectorAll('.cell');
-    for(let i=0;i<cells.length;i++){
-      const ch = s[i] || '';
-      const cell = cells[i];
-      if(ch && /[A-Z]/.test(ch)){
-        cell.textContent = ch;
-        cell.classList.remove('muted');
+  // Deterministic "day" index (UTC)
+  function dayNumberUTC(){
+    const start = Date.UTC(2024,0,1);
+    const now = new Date();
+    const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    const diffDays = Math.floor((todayUTC - start)/86400000);
+    return Math.max(0,diffDays);
+  }
+
+  const dayNo = dayNumberUTC();
+  const target = targets[dayNo % targets.length];
+  const targetMetrics = {
+    len: target.length,
+    sum: sumLetters(target),
+    vow: vowelCount(target),
+    min: minLetterVal(target),
+    max: maxLetterVal(target)
+  };
+
+  // DOM
+  const rowsEl = document.getElementById('rows');
+  const inputEl = document.getElementById('guessInput');
+  const guessBtn = document.getElementById('guessBtn');
+  const giveUpBtn = document.getElementById('giveUpBtn');
+  const msgEl = document.getElementById('msg');
+  const winEl = document.getElementById('win');
+  const dayLabel = document.getElementById('dayLabel');
+  const dateUTCEl = document.getElementById('dateUTC');
+  const puzzleNoEl = document.getElementById('puzzleNo');
+  const lenHintEl = document.getElementById('lenHint');
+  const copyBtn = document.getElementById('copyBtn');
+  const copiedEl = document.getElementById('copied');
+
+  // Populate header info
+  const now = new Date();
+  const isoDate = `${now.getUTCFullYear()}-${String(now.getUTCMonth()+1).padStart(2,'0')}-${String(now.getUTCDate()).padStart(2,'0')}`;
+  dayLabel.textContent = `Daily • ${isoDate}`;
+  dateUTCEl.textContent = isoDate + " (UTC)";
+  puzzleNoEl.textContent = dayNo.toString();
+  lenHintEl.textContent = target.length.toString();
+
+  // State
+  let finished = false;
+  let history = []; // array of {word, m:{len,sum,vow,min,max}, arrows:{...}}
+
+  // Storage key per day
+  const storeKey = `gw_${isoDate}`;
+  // Load previous (if any)
+  try{
+    const saved = JSON.parse(localStorage.getItem(storeKey) || "null");
+    if (saved && saved.t===target && Array.isArray(saved.h)){
+      history = saved.h;
+      finished = !!saved.fin;
+      renderAll();
+      if (finished) onFinish(saved.winMsg||null);
+    }
+  }catch(e){/* ignore */}
+
+  function save(){
+    try{
+      localStorage.setItem(storeKey, JSON.stringify({t:target, h:history, fin:finished, winMsg:winEl.textContent||""}));
+    }catch(e){/* ignore */}
+  }
+
+  function compareArrow(a,b){
+    if (a<b) return 'up';     // need higher
+    if (a>b) return 'down';   // need lower
+    return 'eq';              // matched
+  }
+
+  function renderRow(entry){
+    const tr = document.createElement('tr');
+    const tdGuess = document.createElement('td');
+    tdGuess.className = 'guess';
+    tdGuess.textContent = entry.word;
+    tr.appendChild(tdGuess);
+
+    const cols = ['len','sum','vow','min','max'];
+    cols.forEach(k=>{
+      const td = document.createElement('td');
+      const wrap = document.createElement('div');
+      wrap.className = 'cell';
+      const arrow = document.createElement('div');
+      arrow.className = 'arrow ' + entry.arrows[k];
+      arrow.textContent = entry.arrows[k]==='up'?'▲':entry.arrows[k]==='down'?'▼':'●';
+      const val = document.createElement('div');
+      val.className = 'val';
+      if (k==='min' || k==='max'){
+        val.textContent = toLetter(entry.m[k]);
       }else{
-        cell.textContent = '·';
-        cell.classList.add('muted');
+        val.textContent = entry.m[k];
       }
+      wrap.appendChild(arrow);
+      wrap.appendChild(val);
+      td.appendChild(wrap);
+      tr.appendChild(td);
+    });
+
+    rowsEl.appendChild(tr);
+  }
+
+  function renderAll(){
+    rowsEl.innerHTML = '';
+    history.forEach(renderRow);
+  }
+
+  function feedbackFor(word){
+    const m = {
+      len: word.length,
+      sum: sumLetters(word),
+      vow: vowelCount(word),
+      min: minLetterVal(word),
+      max: maxLetterVal(word)
+    };
+    return {
+      word,
+      m,
+      arrows: {
+        len: compareArrow(m.len, targetMetrics.len),
+        sum: compareArrow(m.sum, targetMetrics.sum),
+        vow: compareArrow(m.vow, targetMetrics.vow),
+        min: compareArrow(m.min, targetMetrics.min),
+        max: compareArrow(m.max, targetMetrics.max)
+      }
+    };
+  }
+
+  function setMsg(text, ok=false){
+    msgEl.textContent = text || '';
+    msgEl.style.color = ok ? 'var(--good)' : 'var(--muted)';
+  }
+
+  function onFinish(customMsg){
+    finished = true;
+    inputEl.disabled = true;
+    guessBtn.disabled = true;
+    giveUpBtn.disabled = true;
+    winEl.classList.add('show');
+    if (!customMsg){
+      winEl.textContent = `You found it in ${history.length} ${history.length===1?'guess':'guesses'}! The word was “${target.toUpperCase()}”.`;
+    }else{
+      winEl.textContent = customMsg;
     }
   }
-
-  function onType(){
-    let s = guessInput.value.toUpperCase();
-    s = s.replace(/[^A-Z]/g,'');
-    if(s.length > L) s = s.slice(0,L);
-    guessInput.value = s;
-    refreshGrids(s);
-  }
-
-  function refreshGrids(aStr){
-    aStr = (aStr || '').toUpperCase();
-    setGridLetters(gridA, aStr.padEnd(L,' '));
-    const bStr = derivePartner(aStr);
-    setGridLetters(gridB, bStr.padEnd(L,' '));
-  }
-
-  function getOffsets(a,b){
-    const out=[];
-    for(let i=0;i<a.length;i++){
-      const ai = a.charCodeAt(i)-65;
-      const bi = b.charCodeAt(i)-65;
-      let d = (bi - ai);
-      d = (d%26+26)%26;
-      out.push(d);
-    }
-    return out;
-  }
-
-  function derivePartner(aStr){
-    let out='';
-    for(let i=0;i<L;i++){
-      const ch = aStr[i];
-      if(!ch || !/[A-Z]/.test(ch)){ out+=' '; continue; }
-      const ai = ch.charCodeAt(0)-65;
-      const bi = (ai + offsets[i])%26;
-      out += String.fromCharCode(65+bi);
-    }
-    return out;
-  }
-
-  let attempts = 0;
-  let won = false;
 
   function submit(){
-    if(won) return;
-    let a = guessInput.value.toUpperCase().replace(/[^A-Z]/g,'');
-    if(a.length !== L){
-      pushStatus('bad', `Please enter ${L} letters for A.`);
-      shake(guessInput);
+    if (finished) return;
+    let w = sanitize(inputEl.value);
+    if (!w){
+      setMsg('Type 4–7 letters to guess.');
       return;
     }
-    const b = derivePartner(a).replace(/[^A-Z]/g,'');
-    attempts++;
-    const aOK = (a === puzzle.a);
-    const bOK = (b === puzzle.b);
-    logAttempt(attempts, a, b, aOK, bOK);
-
-    if(aOK && bOK){
-      won = true;
-      pushStatus('ok', `Solved in ${attempts} ${attempts===1?'try':'tries'}!`);
-      showWin();
-      guessInput.disabled = true;
-      checkBtn.disabled = true;
-      shareBtn.disabled = false;
-    }else{
-      if(!aOK && !bOK){
-        pushStatus('bad', `Not it. A doesn't match Clue A and B doesn't fit Clue B.`);
-      }else if(!aOK){
-        pushStatus('bad', `A doesn't match Clue A.`);
-      }else{
-        pushStatus('bad', `Partner word doesn't answer Clue B.`);
-      }
+    if (w.length < 4 || w.length > 7){
+      setMsg('Word must be 4–7 letters.');
+      return;
     }
+    const entry = feedbackFor(w);
+    history.push(entry);
+    renderRow(entry);
+    inputEl.value = '';
+    setMsg('');
+    if (w === target){
+      onFinish();
+    }
+    save();
   }
 
-  function logAttempt(n, a, b, aOK, bOK){
-    const tr = document.createElement('tr');
-    const tdN = document.createElement('td'); tdN.textContent = n;
-    const tdA = document.createElement('td'); tdA.textContent = a; tdA.className='mono';
-    const tdArrow = document.createElement('td'); tdArrow.textContent = '→';
-    const tdB = document.createElement('td'); tdB.textContent = b; tdB.className='mono';
-    const tdR = document.createElement('td');
-    tdR.innerHTML = (aOK?badge('A✓','ok'):badge('A×','bad')) + ' ' + (bOK?badge('B✓','ok'):badge('B×','bad'));
-    tr.appendChild(tdN);tr.appendChild(tdA);tr.appendChild(tdArrow);tr.appendChild(tdB);tr.appendChild(tdR);
-    logBody.prepend(tr);
+  function reveal(){
+    if (finished) return;
+    onFinish(`Revealed. The word was “${target.toUpperCase()}”. Try again tomorrow!`);
+    save();
   }
 
-  function badge(t,kind){
-    const colors = {
-      ok:'background:#122a21;color:#a5f0d2;border:1px solid #224e3e;',
-      bad:'background:#2a1518;color:#ffb7bf;border:1px solid #4c2a2e;'
-    };
-    return `<span style="font-size:11px;padding:2px 8px;border-radius:999px;${colors[kind]||''}">${t}</span>`;
-  }
-
-  function pushStatus(kind, text){
-    status.innerHTML = '';
-    const tag = document.createElement('span');
-    tag.className = 'tag ' + (kind==='ok'?'ok':kind==='bad'?'bad':'info');
-    tag.textContent = text;
-    status.appendChild(tag);
-  }
-
-  function showWin(){
-    const bar = document.createElement('div');
-    bar.className = 'win';
-    bar.innerHTML = `
-      <div><strong>Well done!</strong> The pair was “${puzzle.a} → ${puzzle.b}”.</div>
-      <div class="hint">Offsets: ${offsets.map(n=>`+${n}`).join('  •  ')}</div>
-    `;
-    status.parentElement.insertBefore(bar, status.parentElement.firstChild);
-  }
-
-  function focusInput(){
-    setTimeout(()=>guessInput.focus(), 50);
-  }
-
-  function shake(el){
-    el.style.transition = 'transform 0.08s';
-    el.style.transform = 'translateX(-6px)';
-    setTimeout(()=>{el.style.transform='translateX(6px)';},80);
-    setTimeout(()=>{el.style.transform='translateX(0)';},160);
-  }
-
-  function shareResult(){
-    const title = `Offset Duo — Daily #${dailyNumber}`;
-    const offs = offsets.map(n=>`+${n}`).join(' ');
-    let body = `${title}\nA→B offsets: ${offs}\nTries: ${attempts}\n`;
-    // add simple attempt summary from table (last up to 6)
-    const rows = Array.from(logBody.querySelectorAll('tr')).slice(0,6).reverse();
-    const lines = rows.map(r=>{
-      const tds = r.querySelectorAll('td');
-      const n = tds[0].textContent.trim();
-      const a = tds[1].textContent.trim();
-      const b = tds[3].textContent.trim();
-      const res = tds[4].innerText.replace(/\s+/g,' ');
-      return `#${n} ${a} → ${b}  ${res}`;
+  function buildShare(){
+    const header = `GaugeWord ${isoDate} • #${dayNo}`;
+    const outcome = finished && history.length>0 && history[history.length-1].word===target
+      ? `Solved in ${history.length}`
+      : `Unsolved (${history.length})`;
+    const rows = history.map(e=>{
+      const cols = ['len','sum','vow','min','max'].map(k=>{
+        const a = e.arrows[k];
+        return a==='eq'?'●':(a==='up'?'▲':'▼');
+      }).join('');
+      return cols;
     });
-    body += lines.join('\n');
-    const full = body + `\nPlay: (local)`;
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(full).then(()=>{
-        pushStatus('ok','Result copied to clipboard.');
-      },()=>{
-        pushStatus('bad','Could not copy. Select text manually.');
-      });
-    }else{
-      pushStatus('bad','Clipboard unavailable.');
-    }
+    return `${header}\n${outcome}\n${rows.join('\n')}`;
   }
 
-  // Populate initial grids with placeholders
-  setGridLetters(gridA, ' '.repeat(L));
-  setGridLetters(gridB, ' '.repeat(L));
+  // Events
+  guessBtn.addEventListener('click', submit);
+  giveUpBtn.addEventListener('click', reveal);
+  inputEl.addEventListener('keydown', (e)=>{
+    if (e.key === 'Enter') submit();
+  });
+  inputEl.addEventListener('input', ()=>{
+    // live constraint: letters only
+    const cur = inputEl.value;
+    const cleaned = cur.replace(/[^a-zA-Z]/g,'');
+    if (cur !== cleaned) inputEl.value = cleaned;
+  });
+  copyBtn.addEventListener('click', async ()=>{
+    const text = buildShare();
+    try{
+      await navigator.clipboard.writeText(text);
+      copiedEl.style.display = 'inline';
+      setTimeout(()=>copiedEl.style.display='none', 1200);
+    }catch(e){
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      copiedEl.style.display = 'inline';
+      setTimeout(()=>copiedEl.style.display='none', 1200);
+    }
+  });
+
+  // Autofocus
+  setTimeout(()=>inputEl.focus(), 60);
 })();
 </script>
 </body>

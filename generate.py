@@ -26,7 +26,11 @@ def update_readme(title: str):
     with open("README.md", "r+", encoding="utf-8") as f:
         content = f.read()
         if TODAY in content:
-            return  # already added
+            return
+
+        if not content.endswith("\n"):
+            f.write("\n")
+
         f.write(line)
 
 def main():

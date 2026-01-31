@@ -17,9 +17,10 @@ Hard requirements:
 - English only.
 
 Design constraints:
-- The entire game must fit within a 1080p screen height (no scrolling).
-- Use compact layout, limited text, and restrained spacing.
-- Assume desktop viewport ~1200x800 minimum.
+- The game must be fully responsive (mobile, tablet, desktop).
+- The entire game must fit within the screen height if possible (minimal scrolling).
+- Use flexible layouts (Flexbox/Grid) and media queries.
+- Ensure touch targets (buttons, interactive elements) are sufficient for mobile.
 
 Content constraints:
 - The game must be new and original each time.

@@ -13,25 +13,28 @@ def extract_title(html: str) -> str:
     return m.group(1).strip() if m else "Daily Word Game"
 
 def update_readme(title: str):
-    line = f"| {TODAY} | {title} | {BASE_URL}/{GAME_PATH} |\n"
+    line = f"| {TODAY} | {title} | [Play]({BASE_URL}/{GAME_PATH}) |\n"
 
-    if not os.path.exists("README.md"):
+    if not os.path.exists("README.md") or os.path.getsize("README.md") == 0:
         with open("README.md", "w", encoding="utf-8") as f:
-            f.write(
-                "# Daily Word Games\n\n"
-                "| Date | Title | Play |\n"
-                "|------|-------|------|\n"
-            )
+            f.write("# Daily Word Games\n\nDaily word games created by AI.\n\n| Date | Title | Play |\n| :--- | :--- | :--- |\n")
+            f.write(line)
+        return
 
-    with open("README.md", "r+", encoding="utf-8") as f:
-        content = f.read()
-        if TODAY in content:
-            return
+    with open("README.md", "r", encoding="utf-8") as f:
+        lines = f.readlines()
 
-        if not content.endswith("\n"):
-            f.write("\n")
+    if any(TODAY in l for l in lines):
+        return
 
-        f.write(line)
+    # Ensure there's a newline before adding the first table row if it's the first one
+    if not lines[-1].endswith("\n"):
+        lines[-1] += "\n"
+    
+    lines.append(line)
+
+    with open("README.md", "w", encoding="utf-8") as f:
+        f.writelines(lines)
 
 def main():
     html = generate_word_game()

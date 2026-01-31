@@ -1,397 +1,947 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Cutline — Today’s Daily Word Split</title>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vowel Void — Daily</title>
 <style>
   :root{
-    --bg:#0e1116;
-    --panel:#161b22;
-    --ink:#e6edf3;
-    --muted:#9aa4b2;
-    --accent:#59b0ff;
-    --ok:#35c27c;
-    --warn:#ff6d6d;
-    --cut:#ff5a60;
-    --gap:#2a3342;
+    --bg:#0f1115;
+    --panel:#161a22;
+    --ink:#e8ecf1;
+    --muted:#aeb7c2;
+    --accent:#57d2a3;
+    --warn:#ff6b6b;
+    --box:#1d2330;
+    --boxBorder:#2a3140;
+    --active:#2d3a51;
+    --good:#1e824c;
+    --bad:#7a2630;
+    --btn:#232a39;
   }
-  html,body{height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;margin:0}
-  .wrap{max-width:980px;margin:0 auto;padding:18px 20px;box-sizing:border-box}
-  header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px}
-  h1{font-size:22px;margin:0;letter-spacing:.3px}
-  .sub{color:var(--muted);font-size:13px}
-  .panel{background:var(--panel);border:1px solid #222a36;border-radius:10px;padding:14px 14px}
-  .rules{font-size:13px;line-height:1.35;color:var(--muted)}
-  .rules b{color:var(--ink)}
-  .streambox{margin-top:12px}
-  .stream{display:flex;align-items:center;justify-content:center;gap:0;background:#0f141b;border:1px solid #1f2633;border-radius:10px;padding:10px 10px;user-select:none;flex-wrap:wrap;row-gap:8px}
-  .cell{width:28px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:linear-gradient(#15202b,#121923);border:1px solid #1f2734;font-weight:700;letter-spacing:0.5px}
-  .gap{width:14px;height:44px;position:relative;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .gap:hover{background:rgba(89,176,255,0.12)}
-  .gap::after{content:"";width:2px;height:24px;background:var(--gap);border-radius:2px;transition:all .12s ease}
-  .gap.cut::after{width:4px;height:30px;background:var(--cut);box-shadow:0 0 6px rgba(255,90,96,.45)}
-  .gap.lock{cursor:not-allowed}
-  .under{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
-  .segments, .clues{flex:1;min-width:300px}
-  .segments h3,.clues h3{font-size:13px;margin:0 0 8px 2px;color:var(--muted);font-weight:600;letter-spacing:.3px}
-  .seglist{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-  .seg{background:#0f141b;border:1px solid #1f2633;border-radius:8px;min-height:42px;display:flex;align-items:center;justify-content:center;font-weight:700;letter-spacing:.4px}
-  .seg.ok{border-color:#1f3b2c;background:linear-gradient(#102017,#0b1611);color:var(--ok)}
-  .seg.wait{opacity:.9}
-  .seg.empty{color:var(--muted);font-weight:600}
-  .cluelist{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-  .clue{background:#0f141b;border:1px dashed #2a3342;border-radius:8px;padding:8px;min-height:42px;display:flex;flex-direction:column;gap:2px}
-  .clue .num{font-size:11px;color:var(--muted)}
-  .clue .txt{font-size:13px}
-  .length{font-size:11px;color:var(--muted)}
-  .bar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap}
-  .btns{display:flex;gap:8px;flex-wrap:wrap}
-  button{background:#152030;color:var(--ink);border:1px solid #263041;border-radius:8px;padding:8px 10px;font-weight:600;cursor:pointer;transition:.12s;font-size:13px}
-  button:hover{border-color:#39506a;background:#18263a}
-  button.primary{background:#1a2f47;border-color:#2c4a6b;color:#cde6ff}
-  button.primary:hover{background:#1e3a58}
-  .status{font-size:13px;color:var(--muted)}
-  .status strong{color:var(--ink)}
-  .win{display:none;margin-top:12px;padding:10px 12px;border:1px solid #1d3d2a;background:#0f1c14;border-radius:8px;color:var(--ok);font-weight:700}
-  .win.show{display:block}
-  .hinted .length{display:inline}
-  .length{display:none}
-  .tag{display:inline-block;background:#132034;border:1px solid #213149;color:#a9c7ec;border-radius:6px;padding:2px 6px;font-size:11px;margin-left:6px}
-  footer{margin-top:14px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;align-items:center}
-  .tiny{font-size:11px;color:#7f8a99}
-  @media (max-width: 840px){
-    .seglist,.cluelist{grid-template-columns:repeat(2,1fr)}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    color:var(--ink);
+    background:var(--bg);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    line-height:1.35;
   }
-  @media (max-width: 600px){
-    .stream{padding:8px 4px}
-    .cell{width:24px;height:34px;font-size:14px}
-    .gap{width:10px;height:40px}
-    .gap::after{height:18px}
-    .gap.cut::after{height:24px}
-    .under{flex-direction:column}
-    .seglist,.cluelist{grid-template-columns:1fr}
-    .btns{justify-content:center;width:100%}
-    button{flex:1;min-width:120px}
+  #app{
+    max-width:860px;
+    margin:0 auto;
+    padding:12px clamp(10px,2.6vw,24px) 18px;
+    display:flex;
+    flex-direction:column;
+    min-height:100%;
+    gap:10px;
   }
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:10px 12px;
+    background:var(--panel);
+    border-radius:12px;
+    border:1px solid #232838;
+  }
+  header h1{
+    font-size:clamp(18px,3.5vw,24px);
+    margin:0;
+    letter-spacing:.3px;
+  }
+  #date{
+    color:var(--muted);
+    font-size:clamp(12px,2.6vw,14px);
+    white-space:nowrap;
+  }
+
+  #rules{
+    background:var(--panel);
+    border:1px solid #232838;
+    border-radius:12px;
+    padding:10px 12px;
+    font-size:clamp(12px,2.6vw,14px);
+    color:var(--muted);
+  }
+  #rules b{color:var(--ink)}
+  #progress{
+    font-size:14px;
+    color:var(--muted);
+    padding:2px 2px 0 2px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  @media(min-width:720px){
+    .grid{grid-template-columns:1fr 1fr}
+  }
+
+  .card{
+    background:var(--panel);
+    border:1px solid #232838;
+    border-radius:14px;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    min-height:120px;
+  }
+  .card.active{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  .clue{
+    color:var(--ink);
+    font-weight:600;
+    font-size:clamp(14px,2.8vw,16px);
+  }
+  .sub{
+    color:var(--muted);
+    font-size:12px;
+  }
+  .slots{
+    display:grid;
+    grid-auto-flow:column;
+    grid-auto-columns:minmax(clamp(28px,4.6vw,44px),1fr);
+    gap:6px;
+    width:100%;
+  }
+  .box{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    aspect-ratio:1/1.1;
+    background:var(--box);
+    border:1px solid var(--boxBorder);
+    border-radius:10px;
+    font-weight:700;
+    font-size:clamp(16px,4vw,22px);
+    user-select:none;
+  }
+  .box.fixed{
+    color:#cbd3df;
+    background:linear-gradient(180deg,#202739,#1b2130);
+  }
+  .box.blank{
+    color:#8aa3c7;
+    background:linear-gradient(180deg,#1a2130,#151b28);
+  }
+  .box.blank.filled{color:#e5ecf7}
+  .box.blank.caret{
+    border-color:var(--accent);
+    box-shadow:0 0 0 2px rgba(87,210,163,.15) inset;
+  }
+  .box.bad{
+    animation:shake .22s linear 0s 1;
+    background:linear-gradient(180deg,#2a1820,#20141a);
+    border-color:#5b1f2a;
+    color:#ffc9c9;
+  }
+  @keyframes shake {
+    0%{transform:translateX(0)}
+    25%{transform:translateX(-3px)}
+    50%{transform:translateX(3px)}
+    75%{transform:translateX(-2px)}
+    100%{transform:translateX(0)}
+  }
+  .controls{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .left, .right{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  button{
+    cursor:pointer;
+    background:var(--btn);
+    border:1px solid #2b3345;
+    color:var(--ink);
+    padding:10px 12px;
+    border-radius:12px;
+    font-weight:700;
+    letter-spacing:.3px;
+    transition:transform .03s ease, background .15s ease, border-color .15s ease;
+    touch-action:manipulation;
+    min-height:44px;
+  }
+  button:active{transform:translateY(1px)}
+  button.small{
+    padding:6px 8px;
+    min-height:34px;
+    border-radius:10px;
+    font-weight:600;
+  }
+  button.primary{
+    background:linear-gradient(180deg,#2f865f,#256e4f);
+    border-color:#2c8d6b;
+  }
+  button.ghost{
+    background:transparent;
+    border-color:#2b3345;
+  }
+  button.good{
+    background:linear-gradient(180deg,#2b6c46,#22553a);
+    border-color:#2b8d69;
+  }
+  button.warn{
+    background:linear-gradient(180deg,#7b2730,#5c1e25);
+    border-color:#8a2d37;
+  }
+  .status{
+    color:var(--muted);
+    font-size:12px;
+  }
+  .solved .slots .box.blank{
+    background:linear-gradient(180deg,#204430,#1a3727);
+    border-color:#2f6d4f;
+    color:#d7ffea;
+  }
+  .solved .clue::after{
+    content:"  ✓";
+    color:var(--accent);
+    font-weight:800;
+    margin-left:4px;
+  }
+
+  #keypad{
+    position:sticky;
+    bottom:0;
+    z-index:5;
+    background:linear-gradient(180deg, rgba(15,17,21,0.2), rgba(15,17,21,1) 18%);
+    padding-top:8px;
+  }
+  .pad{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:center;
+    background:var(--panel);
+    border:1px solid #232838;
+    border-radius:14px;
+    padding:8px;
+  }
+  .key{
+    flex:1 1 auto;
+    min-width:58px;
+  }
+  .key.secondary{
+    background:#222a39;
+    min-width:72px;
+  }
+  .toast{
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    margin-top:6px;
+    min-height:16px;
+  }
+
+  footer{
+    margin-top:6px;
+    color:var(--muted);
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(8,10,13,.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+  }
+  .modal{
+    background:var(--panel);
+    border:1px solid #2a3140;
+    border-radius:16px;
+    padding:18px;
+    width:min(540px,94vw);
+  }
+  .modal h2{
+    margin:0 0 8px;
+    font-size:22px;
+  }
+  .modal p{
+    margin:6px 0;
+    color:var(--muted);
+    font-size:14px;
+  }
+  .row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:8px;
+  }
+  .hidden{display:none}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div id="app" aria-live="polite">
   <header>
-    <div>
-      <h1>Cutline</h1>
-      <div class="sub" id="dateLine"></div>
-    </div>
-    <div class="sub" id="puzzleId"></div>
+    <h1>Vowel Void — Daily</h1>
+    <div id="date"></div>
   </header>
 
-  <div class="panel rules">
-    Split the letter stream into four words that match the clues (left to right).
-    - Place exactly three cuts by clicking between letters. Click again to remove.
-    - Use every letter in order; no rearranging.
-    - When all four segments match, you win.
+  <div id="rules">
+    <b>Fill the missing vowels to complete each word.</b>
+    Consonants are already placed. Only A, E, I, O, U are missing; the letter Y is shown if present.
+    Tap a card to activate it, then use the vowel keys or your keyboard. Press Check to lock in your answer.
   </div>
 
-  <div class="panel streambox">
-    <div id="stream" class="stream" aria-label="Letter stream"></div>
+  <div id="progress">Solved 0/4</div>
 
-    <div class="under">
-      <div class="segments">
-        <h3>Segments</h3>
-        <div id="seglist" class="seglist"></div>
-      </div>
-      <div class="clues">
-        <h3>Clues</h3>
-        <div id="cluelist" class="cluelist"></div>
-      </div>
-    </div>
+  <div id="puzzles" class="grid"></div>
 
-    <div class="bar">
-      <div class="btns">
-        <button id="checkBtn" class="primary">Check</button>
-        <button id="resetBtn">Reset Cuts</button>
-        <button id="hintBtn">Reveal Lengths</button>
-        <button id="giveBtn">Give Up (Show Cuts)</button>
-      </div>
-      <div class="status" id="status">Place 3 cuts to make 4 words.</div>
+  <div id="keypad">
+    <div class="pad" role="group" aria-label="Vowel keypad">
+      <button class="key" data-k="A" aria-label="A">A</button>
+      <button class="key" data-k="E" aria-label="E">E</button>
+      <button class="key" data-k="I" aria-label="I">I</button>
+      <button class="key" data-k="O" aria-label="O">O</button>
+      <button class="key" data-k="U" aria-label="U">U</button>
+      <button class="key secondary" data-k="BACK" aria-label="Backspace">⌫</button>
+      <button class="key secondary" data-k="CLEAR" aria-label="Clear">Clear</button>
+      <button class="key primary" data-k="CHECK" aria-label="Check">Check</button>
     </div>
-    <div id="win" class="win">Solved! Nicely sliced.</div>
+    <div class="toast" id="toast"></div>
   </div>
 
   <footer>
-    <div class="tiny">Deterministic daily puzzle. No timers, no tricks.</div>
-    <div class="tiny">Tip: Think of familiar pairings that can nest together.</div>
+    <div>Tip: Tap a blank box to place the caret there. Enter toggles Check on the active card.</div>
+    <div>
+      <button id="reset" class="small ghost">Reset today</button>
+    </div>
   </footer>
+
+  <div id="win" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="winTitle">
+    <div class="modal">
+      <h2 id="winTitle">All vowels found!</h2>
+      <p id="winLine"></p>
+      <div class="row">
+        <button id="copy" class="primary">Copy result</button>
+        <button id="closeWin" class="ghost">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 (function(){
-  // Daily set (32 entries). Each puzzle is four words; stream is their concatenation.
-  const PUZZLES = [
-    {words:["tiny","house","plant","pots"], clues:[
-      "very small","dwelling","living organism","containers"]},
-    {words:["quick","brown","fox","jumps"], clues:[
-      "rapid","color","cunning animal","leaps"]},
-    {words:["paper","clip","chain","links"], clues:[
-      "sheet","fastener","series","connections"]},
-    {words:["moon","light","sugar","cubes"], clues:[
-      "Earth's satellite","illumination","sweetener","blocks"]},
-    {words:["north","wind","chill","factor"], clues:[
-      "direction","breeze","coldness","component"]},
-    {words:["green","thumb","garden","tools"], clues:[
-      "color","digit","cultivated plot","implements"]},
-    {words:["coffee","table","book","stack"], clues:[
-      "beverage","furniture surface","volume","pile"]},
-    {words:["river","bank","loan","office"], clues:[
-      "flowing water","edge","borrowed money","workplace"]},
-    {words:["silent","film","star","system"], clues:[
-      "quiet","movie","celebrity","arrangement"]},
-    {words:["wheel","chair","ramp","access"], clues:[
-      "circular part","seat","incline","entry"]},
-    {words:["night","train","track","switch"], clues:[
-      "darkness","rail transport","path","change"]},
-    {words:["sound","proof","room","test"], clues:[
-      "noise","evidence","chamber","exam"]},
-    {words:["water","fall","color","grade"], clues:[
-      "liquid","drop","hue","rating"]},
-    {words:["solar","power","grid","failure"], clues:[
-      "sun-based","energy","network","breakdown"]},
-    {words:["bread","crumb","trail","marker"], clues:[
-      "loaf base","tiny bit","path","indicator"]},
-    {words:["clock","work","shop","window"], clues:[
-      "timepiece","labor","store","pane"]},
-    {words:["train","station","master","key"], clues:[
-      "rail vehicle","terminal","expert","opener"]},
-    {words:["stone","cold","press","juice"], clues:[
-      "rock","chilly","machine","drink"]},
-    {words:["space","bar","code","reader"], clues:[
-      "void","tavern","stripes & digits","device"]},
-    {words:["shadow","box","office","hours"], clues:[
-      "silhouette","container","ticket counter","times"]},
-    {words:["finger","print","screen","time"], clues:[
-      "digit","mark","display","duration"]},
-    {words:["silver","lining","cloud","cover"], clues:[
-      "precious metal","inner layer","sky puff","concealment"]},
-    {words:["market","place","setting","sun"], clues:[
-      "commerce","location","arrangement","evening star"]},
-    {words:["under","ground","water","pipe"], clues:[
-      "beneath","earth","liquid","tube"]},
-    {words:["heavy","metal","band","leader"], clues:[
-      "weighty","element","group","chief"]},
-    {words:["broken","heart","break","dance"], clues:[
-      "damaged","organ","pause","street style"]},
-    {words:["double","blind","taste","test"], clues:[
-      "twofold","sightless","flavor","trial"]},
-    {words:["mirror","ball","room","service"], clues:[
-      "reflector","sphere","chamber","assistance"]},
-    {words:["open","secret","hand","shake"], clues:[
-      "not shut","mystery","body part","greeting"]},
-    {words:["storm","front","page","number"], clues:[
-      "tempest","leading edge","newspaper leaf","numeral"]},
-    {words:["cheap","trick","shot","glass"], clues:[
-      "low-cost","ruse","attempt","vessel"]},
-    {words:["garden","path","story","twist"], clues:[
-      "yard plot","walkway","tale","turn"]}
+  const VOWELS = new Set(['A','E','I','O','U']);
+  // Curated word list with clues. Only letters A-Z; Y is treated as consonant and stays visible.
+  const WORDS = [
+    ["BANANA","Yellow curved fruit."],
+    ["ELEPHANT","Largest land animal."],
+    ["COMPUTER","Machine that processes data."],
+    ["MOUNTAIN","High natural rise of the earth."],
+    ["ASTRONAUT","Space traveler."],
+    ["NOTEBOOK","Paper pages bound for writing."],
+    ["HOSPITAL","Place for medical care."],
+    ["NEWSPAPER","Daily printed news."],
+    ["RAINBOW","Arc of colors after rain."],
+    ["LIBRARY","Place to borrow books."],
+    ["CHOCOLATE","Sweet made from cocoa."],
+    ["CALENDAR","Shows months and days."],
+    ["SUNFLOWER","Tall yellow garden plant."],
+    ["HEADPHONES","Worn to listen privately."],
+    ["MICROSCOPE","Tool to see very small things."],
+    ["TELESCOPE","Tool to see distant objects."],
+    ["ADVENTURE","Exciting or unusual experience."],
+    ["DISCOVERY","Finding something new."],
+    ["SHAMPOO","Soap for hair."],
+    ["BACKPACK","Bag carried on the back."],
+    ["PARALLEL","Side by side with the same distance."],
+    ["SUBMARINE","Underwater vessel."],
+    ["LANTERN","Portable light."],
+    ["CUSHION","Soft pillow."],
+    ["PASSWORD","Secret characters for access."],
+    ["SUNLIGHT","Light from the sun."],
+    ["MUSICIAN","Person who plays music."],
+    ["TEACHER","One who teaches."],
+    ["APPETITE","Desire to eat."],
+    ["HONEYCOMB","Structure in a beehive."],
+    ["WATERFALL","Falling water over a cliff."],
+    ["NEIGHBOR","Person living next door."],
+    ["AIRPLANE","Flying vehicle."],
+    ["CARPENTER","Woodworking tradesperson."],
+    ["VOLCANO","Mountain that can erupt."],
+    ["RIVERSIDE","Land beside flowing water."],
+    ["PAINTBRUSH","Tool for applying color."],
+    ["BACKGAMMON","Classic board game."],
+    ["STRAWBERRY","Red seeded fruit."],
+    ["RAINCOAT","Waterproof outerwear."],
+    ["ARCHITECT","Designer of buildings."],
+    ["CABBAGE","Leafy green vegetable."],
+    ["SAUSAGE","Seasoned meat in a casing."],
+    ["AIRPORT","Place where planes take off and land."],
+    ["BLUEBERRY","Small blue fruit."],
+    ["MEASUREMENT","The act or result of measuring."],
+    ["PARAMETER","A defining limit or boundary."],
+    ["EQUATION","Mathematical statement of equality."],
+    ["TRIANGLE","Three-sided polygon."],
+    ["OCTOPUS","Eight-armed sea creature."],
+    ["PEANUT","Legume used for butter."],
+    ["HURRICANE","Powerful tropical storm."],
+    ["STADIUM","Sports arena with seating."],
+    ["DANGEROUS","Able to cause harm."],
+    ["GENERATOR","Machine that produces electricity."],
+    ["MAGAZINE","Periodical publication."],
+    ["PAJAMAS","Sleepwear."],
+    ["AIRBAG","Safety device in cars."],
+    ["LANDSCAPE","Visible features of land."],
+    ["SEAPORT","Harbor for ships."],
+    ["DINOSAUR","Prehistoric reptile."],
+    ["SUNGLASSES","Eyewear for bright light."],
+    ["GARLIC","Pungent cooking bulb."],
+    ["LEMONADE","Sweetened citrus drink."],
+    ["CHEMICAL","Relating to substances."],
+    ["POPCORN","Popped snack."],
+    ["CATERPILLAR","Butterfly larva."],
+    ["RULER","Tool for measuring length."],
+    ["HAMMER","Tool for nails."],
+    ["KITCHEN","Room for cooking."],
+    ["FOUNTAIN","Ornamental water feature."],
+    ["ALGORITHM","Step-by-step procedure."],
+    ["SEASHELL","Beach find."],
+    ["ORANGE","Color and fruit."],
+    ["CAMERA","Device that takes photographs."],
+    ["BATTERY","Power source."],
+    ["MEADOW","Grassland."],
+    ["SANDWICH","Filled bread meal."],
+    ["BOARDWALK","Wooden path by the sea."],
+    ["WORKSHOP","Place to make or learn."],
+    ["OPINION","Personal view."],
+    ["RECIPE","Cooking instructions."],
+    ["TOURNAMENT","Series of competitive games."],
+    ["GREENHOUSE","Glass building for plants."],
+    ["CONTINENT","One of Earth's large landmasses."],
+    ["ELEVATOR","Lift in a building."],
+    ["AUDIENCE","Group of spectators."],
+    ["CURTAIN","Drapery for window or stage."],
+    ["PAINTER","Person who applies paint."],
+    ["BREADCRUMB","Small piece of bread."],
+    ["HEDGEHOG","Small spiny mammal."],
+    ["POMEGRANATE","Fruit with many seeds."],
+    ["LEMUR","Nocturnal primate."]
   ];
 
-  // Deterministic daily selection (UTC days since 2024-01-01)
-  function dayIndexUTC(){
-    const now = new Date();
-    const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-    const epochUTC = Date.UTC(2024,0,1);
-    return Math.floor((todayUTC - epochUTC) / 86400000);
-  }
-  const dayIndex = dayIndexUTC();
-  const puzzleIndex = ((dayIndex % PUZZLES.length)+PUZZLES.length)%PUZZLES.length;
-  const puzzleNum = dayIndex + 1; // overall counting
-  const puzzle = PUZZLES[puzzleIndex];
-  const WORDS = puzzle.words.slice();
-  const STREAM = WORDS.join("").toUpperCase();
-  const TARGET = WORDS.map(w=>w.toUpperCase());
+  const appDate = new Date();
+  const yyyy = appDate.getFullYear();
+  const mm = String(appDate.getMonth()+1).padStart(2,'0');
+  const dd = String(appDate.getDate()).padStart(2,'0');
+  const dateStr = `${yyyy}-${mm}-${dd}`;
+  document.getElementById('date').textContent = dateStr;
 
-  // Elements
-  const streamEl = document.getElementById('stream');
-  const seglistEl = document.getElementById('seglist');
-  const cluelistEl = document.getElementById('cluelist');
-  const statusEl = document.getElementById('status');
-  const checkBtn = document.getElementById('checkBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const hintBtn = document.getElementById('hintBtn');
-  const giveBtn = document.getElementById('giveBtn');
-  const winEl = document.getElementById('win');
-  const dateLine = document.getElementById('dateLine');
-  const puzzleId = document.getElementById('puzzleId');
-
-  // Header info
-  const now = new Date();
-  dateLine.textContent = now.toLocaleDateString(undefined,{weekday:'short',year:'numeric',month:'short',day:'numeric'});
-  puzzleId.textContent = `Daily #${puzzleNum}  •  Set ${puzzleIndex+1}/${PUZZLES.length}`;
-
-  // Build clue cards
-  function renderClues(showLengths){
-    cluelistEl.innerHTML = "";
-    puzzle.clues.forEach((txt,i)=>{
-      const d = document.createElement('div');
-      d.className = 'clue';
-      const n = document.createElement('div'); n.className = 'num'; n.textContent = `Clue ${i+1}`;
-      const t = document.createElement('div'); t.className = 'txt'; t.textContent = txt;
-      const len = document.createElement('div'); len.className = 'length'; len.textContent = `(${WORDS[i].length})`;
-      if(showLengths) len.style.display = 'inline';
-      t.appendChild(len);
-      d.appendChild(n); d.appendChild(t);
-      cluelistEl.appendChild(d);
-    });
-    if(showLengths) cluelistEl.parentElement.parentElement.classList.add('hinted');
+  function dayNumber(d){
+    const t = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    return Math.floor(t.getTime()/86400000);
   }
 
-  // Build stream cells and gaps
-  const cuts = new Set(); // cut after index i (0..n-2)
-  function buildStream(){
-    streamEl.innerHTML = "";
-    for(let i=0;i<STREAM.length;i++){
-      const c = document.createElement('div');
-      c.className = 'cell';
-      c.textContent = STREAM[i];
-      streamEl.appendChild(c);
-      if(i<STREAM.length-1){
-        const g = document.createElement('div');
-        g.className = 'gap';
-        g.setAttribute('role','button');
-        g.setAttribute('aria-label','Toggle cut');
-        g.dataset.idx = i.toString();
-        if(cuts.has(i)) g.classList.add('cut');
-        g.addEventListener('click', onGapClick);
-        streamEl.appendChild(g);
-      }
+  // Deterministic LCG for daily selection
+  function* lcg(seed){
+    let s = (seed % 2147483647); if (s<=0) s += 2147483646;
+    while(true){
+      s = (s * 48271) % 2147483647;
+      yield s;
     }
   }
+  const seed = dayNumber(appDate) + 1000; // offset for stability
+  const gen = lcg(seed);
 
-  function onGapClick(e){
-    const idx = parseInt(e.currentTarget.dataset.idx,10);
-    if(cuts.has(idx)){
-      cuts.delete(idx);
-      e.currentTarget.classList.remove('cut');
-      e.currentTarget.classList.remove('lock');
-      setStatus(`Cut removed (${cuts.size}/3).`);
-    }else{
-      if(cuts.size>=3){
-        // brief lock flash
-        e.currentTarget.classList.add('lock');
-        setStatus("Only 3 cuts allowed.");
-        setTimeout(()=>e.currentTarget.classList.remove('lock'),180);
-        return;
-      }
-      cuts.add(idx);
-      e.currentTarget.classList.add('cut');
-      setStatus(`Cut placed (${cuts.size}/3).`);
+  function pickDaily(count){
+    const set = new Set();
+    while(set.size<count){
+      const idx = gen.next().value % WORDS.length;
+      set.add(idx);
     }
-    renderSegments();
-    checkWin(false);
+    return Array.from(set);
   }
 
-  function currentSegments(){
-    const n = STREAM.length;
-    const sorted = Array.from(cuts).sort((a,b)=>a-b);
-    const bounds = [0, ...sorted.map(x=>x+1), n];
-    const segs = [];
-    for(let i=0;i<bounds.length-1;i++){
-      const s = STREAM.slice(bounds[i], bounds[i+1]);
-      if(s.length) segs.push(s);
-    }
-    return segs;
-  }
+  // Build four puzzles daily
+  const DAILY_COUNT = 4;
+  const indices = pickDaily(DAILY_COUNT);
+  const puzzles = indices.map((i, k) => buildPuzzle(WORDS[i][0], WORDS[i][1], k));
 
-  function renderSegments(){
-    const segs = currentSegments();
-    seglistEl.innerHTML = "";
-    for(let i=0;i<4;i++){
-      const div = document.createElement('div');
-      div.className = 'seg';
-      const s = segs[i]||"";
-      if(!s){
-        div.classList.add('empty');
-        div.textContent = '…';
+  // State persistence
+  const storageKey = `vowel-void-${dateStr}`;
+  const saved = loadState();
+  if(saved){ restoreState(saved); }
+
+  // Render
+  const grid = document.getElementById('puzzles');
+  puzzles.forEach((p, i)=> grid.appendChild(renderCard(p, i)));
+  let active = firstPlayable() ?? 0;
+  setActive(active);
+
+  // Keypad events
+  document.getElementById('keypad').addEventListener('click', (e)=>{
+    const k = e.target.getAttribute('data-k');
+    if(!k) return;
+    if(k === 'BACK') handleBackspace();
+    else if(k === 'CLEAR') handleClear();
+    else if(k === 'CHECK') handleCheck();
+    else handleInput(k);
+  });
+
+  // Keyboard support
+  document.addEventListener('keydown',(e)=>{
+    if(isModalOpen()) return;
+    const key = e.key.toUpperCase();
+    if(VOWELS.has(key)){ e.preventDefault(); handleInput(key); return; }
+    if(e.key === 'Backspace'){ e.preventDefault(); handleBackspace(); return; }
+    if(e.key === 'Enter'){ e.preventDefault(); handleCheck(); return; }
+    // ignore others
+  });
+
+  // Reset
+  document.getElementById('reset').addEventListener('click', ()=>{
+    if(confirm('Reset progress for today?')){
+      localStorage.removeItem(storageKey);
+      puzzles.forEach(p=>{
+        p.values = Array(p.blanks.length).fill(null);
+        p.cursor = 0;
+        p.solved = false;
+        p.attempts = 0;
+        p.hinted = false;
+      });
+      rerenderAll();
+      setActive(firstPlayable() ?? 0);
+      toast('Progress cleared.');
+    }
+  });
+
+  // Win overlay controls
+  document.getElementById('closeWin').addEventListener('click', closeWin);
+  document.getElementById('copy').addEventListener('click', copyShare);
+
+  // Functions
+  function buildPuzzle(word, clue, index){
+    const W = word.toUpperCase();
+    const chars = [...W];
+    const blanks = [];
+    const slots = chars.map((ch, i)=>{
+      if(VOWELS.has(ch)){
+        blanks.push(i);
+        return {type:'vowel', letter:null, index:i}
       }else{
-        div.textContent = s;
-        if(TARGET[i]===s){
-          div.classList.add('ok');
+        return {type:'consonant', letter:ch, index:i}
+      }
+    });
+    return {
+      id:index,
+      word:W,
+      clue,
+      slots,    // array with type and fixed letter for consonants
+      blanks,   // indices into slots for vowels in order left->right
+      values:Array(blanks.length).fill(null), // player letters for vowel slots
+      cursor:0,
+      attempts:0,
+      solved:false,
+      hinted:false
+    };
+  }
+
+  function renderCard(p, i){
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `card-${i}`;
+    card.setAttribute('role','group');
+    card.setAttribute('aria-label', `Puzzle ${i+1}`);
+    card.addEventListener('click', (ev)=>{
+      // If clicked on a specific blank, move caret
+      const box = ev.target.closest('.box[data-blank]');
+      if(box){
+        const bIdx = Number(box.getAttribute('data-blank'));
+        p.cursor = bIdx;
+      }
+      setActive(i);
+    });
+
+    const clue = document.createElement('div');
+    clue.className = 'clue';
+    clue.textContent = p.clue;
+    card.appendChild(clue);
+
+    const sub = document.createElement('div');
+    sub.className = 'sub';
+    sub.textContent = toPattern(p);
+    card.appendChild(sub);
+
+    const slots = document.createElement('div');
+    slots.className = 'slots';
+    slots.id = `slots-${i}`;
+    populateSlots(slots, p);
+    card.appendChild(slots);
+
+    const ctr = document.createElement('div');
+    ctr.className = 'controls';
+    const left = document.createElement('div');
+    left.className = 'left';
+    const checkBtn = document.createElement('button');
+    checkBtn.className = 'primary small';
+    checkBtn.textContent = 'Check';
+    checkBtn.addEventListener('click', (e)=>{ e.stopPropagation(); setActive(i); handleCheck(); });
+    left.appendChild(checkBtn);
+    const hintBtn = document.createElement('button');
+    hintBtn.className = 'small ghost';
+    hintBtn.textContent = 'Hint';
+    hintBtn.title = 'Reveal one vowel';
+    hintBtn.addEventListener('click', (e)=>{ e.stopPropagation(); setActive(i); doHint(); });
+    left.appendChild(hintBtn);
+
+    const right = document.createElement('div');
+    right.className='right';
+    const status = document.createElement('div');
+    status.className = 'status';
+    status.id = `status-${i}`;
+    status.textContent = '';
+    right.appendChild(status);
+
+    ctr.appendChild(left);
+    ctr.appendChild(right);
+    card.appendChild(ctr);
+
+    return card;
+  }
+
+  function populateSlots(container, p){
+    container.innerHTML = '';
+    // Map blanks positions to values
+    const valByIndex = new Map();
+    p.blanks.forEach((pos, i)=> valByIndex.set(pos, p.values[i]));
+    p.slots.forEach((slot, pos)=>{
+      const box = document.createElement('div');
+      box.className = 'box';
+      if(slot.type==='consonant'){
+        box.classList.add('fixed');
+        box.textContent = slot.letter;
+        box.setAttribute('aria-hidden','true');
+      } else {
+        box.classList.add('blank');
+        const blankOrder = p.blanks.indexOf(pos);
+        box.setAttribute('data-blank', String(blankOrder));
+        const v = valByIndex.get(pos);
+        if(v){
+          box.textContent = v;
+          box.classList.add('filled');
         }else{
-          div.classList.add('wait');
+          box.textContent = '';
         }
       }
-      seglistEl.appendChild(div);
+      container.appendChild(box);
+    });
+  }
+
+  function toPattern(p){
+    // Show consonant pattern with • for vowels
+    return [...p.word].map(ch => VOWELS.has(ch)? '•' : ch).join(' ');
+  }
+
+  function setActive(i){
+    active = i;
+    document.querySelectorAll('.card').forEach((el,idx)=>{
+      el.classList.toggle('active', idx===i);
+    });
+    highlightCaret();
+    saveState();
+  }
+
+  function highlightCaret(){
+    // clear all carets
+    document.querySelectorAll('.box.blank').forEach(b=> b.classList.remove('caret'));
+    const p = puzzles[active];
+    if(!p || p.solved) return;
+    const b = document.querySelector(`#card-${active} .box.blank[data-blank="${p.cursor}"]`);
+    if(b) b.classList.add('caret');
+  }
+
+  function current(){
+    return puzzles[active];
+  }
+
+  function firstPlayable(){
+    for(let i=0;i<puzzles.length;i++){
+      if(!puzzles[i].solved) return i;
     }
+    return null;
   }
 
-  function setStatus(msg){
-    statusEl.innerHTML = msg;
+  function nextEmptyIndex(p){
+    for(let i=0;i<p.values.length;i++){
+      if(!p.values[i]) return i;
+    }
+    return p.values.length - 1;
   }
 
-  function checkWin(fromButton){
-    const segs = currentSegments();
-    let ok = segs.length===4 && segs.every((s,i)=>s===TARGET[i]);
-    if(ok){
-      winEl.classList.add('show');
-      setStatus(`<strong>Win!</strong> ${WORDS.map(w=>w.toUpperCase()).join(" • ")}`);
-      // freeze interactions
-      document.querySelectorAll('.gap').forEach(g=>g.style.pointerEvents='none');
-      return true;
-    }else{
-      if(fromButton){
-        if(segs.length<4){
-          setStatus(`Not yet. You need ${4-segs.length} more segment${4-segs.length===1?"":"s"}.`);
-        }else{
-          let count = 0;
-          for(let i=0;i<4;i++) if(segs[i]===TARGET[i]) count++;
-          setStatus(`Keep slicing: ${count}/4 segments correct.`);
+  function handleInput(letter){
+    const p = current();
+    if(!p || p.solved) return;
+    if(!VOWELS.has(letter)){
+      toast('Only A E I O U are allowed.');
+      return;
+    }
+    // Place at cursor
+    p.values[p.cursor] = letter;
+    // Advance caret
+    const next = findNextCursor(p, p.cursor);
+    p.cursor = next;
+    refreshPuzzle(active);
+    saveState();
+  }
+
+  function findNextCursor(p, from){
+    // go forward to next empty; else stay at last
+    for(let i=from+1;i<p.values.length;i++){
+      if(!p.values[i]) return i;
+    }
+    for(let i=0;i<=from;i++){
+      if(!p.values[i]) return i;
+    }
+    return Math.min(from, p.values.length-1);
+  }
+
+  function handleBackspace(){
+    const p = current();
+    if(!p || p.solved) return;
+    // If current has value, clear it; else move left then clear
+    if(p.values[p.cursor]){
+      p.values[p.cursor] = null;
+    } else {
+      // move left to previous filled
+      for(let i=p.cursor-1;i>=0;i--){
+        if(p.values[i]){
+          p.cursor = i;
+          p.values[i] = null;
+          break;
         }
       }
-      return false;
+    }
+    refreshPuzzle(active);
+    saveState();
+  }
+
+  function handleClear(){
+    const p = current();
+    if(!p || p.solved) return;
+    p.values = Array(p.values.length).fill(null);
+    p.cursor = 0;
+    refreshPuzzle(active);
+    saveState();
+  }
+
+  function handleCheck(){
+    const p = current();
+    if(!p || p.solved) return;
+    if(p.values.some(v=>!v)){
+      toast('Fill all vowels before checking.');
+      wiggleBlanks(active);
+      return;
+    }
+    p.attempts += 1;
+    const guess = buildGuess(p);
+    if(guess === p.word){
+      p.solved = true;
+      refreshPuzzle(active, true);
+      toast('Correct!');
+      saveState();
+      checkWin();
+      // move to next unsolved
+      const nxt = firstPlayable();
+      if(nxt !== null) setActive(nxt);
+    } else {
+      showMismatches(active);
+      toast('Not quite. Try again.');
+      saveState();
     }
   }
 
-  // Buttons
-  checkBtn.addEventListener('click', ()=>{ renderSegments(); checkWin(true); });
-  resetBtn.addEventListener('click', ()=>{
-    cuts.clear();
-    buildStream();
-    renderSegments();
-    winEl.classList.remove('show');
-    setStatus("Cuts cleared. Place 3 cuts to make 4 words.");
-  });
-  let hinted = false;
-  hintBtn.addEventListener('click', ()=>{
-    hinted = true;
-    renderClues(true);
-    setStatus("Lengths revealed.");
-  });
-  giveBtn.addEventListener('click', ()=>{
-    // Place cuts at the true boundaries
-    cuts.clear();
-    let pos = 0;
-    for(let i=0;i<WORDS.length-1;i++){
-      pos += WORDS[i].length - 1; // index after which to cut
-      cuts.add(pos);
-      pos += 1; // move to next start
-    }
-    // Recompute: simpler method: rebuild by adding cumulative.
-    cuts.clear();
-    let acc = 0;
-    for(let i=0;i<WORDS.length-1;i++){
-      acc += WORDS[i].length;
-      cuts.add(acc-1);
-    }
-    buildStream();
-    renderSegments();
-    checkWin(false);
-    setStatus("Solution shown.");
-  });
+  function buildGuess(p){
+    const arr = [...p.word];
+    p.blanks.forEach((pos, i)=>{
+      arr[pos] = p.values[i] || '_';
+    });
+    return arr.join('');
+  }
 
-  // Initial render
-  renderClues(false);
-  buildStream();
-  renderSegments();
+  function showMismatches(idx){
+    const p = puzzles[idx];
+    const slotsEl = document.getElementById(`slots-${idx}`);
+    const correct = [...p.word];
+    p.blanks.forEach((pos, i)=>{
+      const user = p.values[i];
+      const ok = user === correct[pos];
+      const box = slotsEl.querySelector(`.box.blank[data-blank="${i}"]`);
+      box.classList.remove('bad');
+      if(!ok){
+        box.classList.add('bad');
+        setTimeout(()=> box.classList.remove('bad'), 240);
+      }
+    });
+  }
+
+  function wiggleBlanks(idx){
+    const p = puzzles[idx];
+    const slotsEl = document.getElementById(`slots-${idx}`);
+    p.blanks.forEach((pos, i)=>{
+      const box = slotsEl.querySelector(`.box.blank[data-blank="${i}"]`);
+      if(!p.values[i]){
+        box.classList.add('bad');
+        setTimeout(()=> box.classList.remove('bad'), 240);
+      }
+    });
+  }
+
+  function doHint(){
+    const p = current();
+    if(!p || p.solved) return;
+    if(p.hinted){
+      toast('Hint already used on this card.');
+      return;
+    }
+    // Deterministic hint position based on day seed and card id
+    const day = dayNumber(appDate);
+    const pos = (day + p.id*3 + 7) % p.blanks.length;
+    const targetLetter = p.word[p.blanks[pos]];
+    p.values[pos] = targetLetter;
+    p.cursor = findNextCursor(p, pos);
+    p.hinted = true;
+    refreshPuzzle(active);
+    saveState();
+    toast('A vowel was revealed.');
+  }
+
+  function refreshPuzzle(i, solvedNow=false){
+    const p = puzzles[i];
+    const card = document.getElementById(`card-${i}`);
+    const sub = card.querySelector('.sub');
+    sub.textContent = toPattern(p);
+    populateSlots(card.querySelector('.slots'), p);
+    const status = document.getElementById(`status-${i}`);
+    if(p.solved){
+      status.textContent = `Solved in ${p.attempts} ${p.attempts===1?'try':'tries'}.`;
+      card.classList.add('solved');
+    } else {
+      status.textContent = p.attempts ? `Tries: ${p.attempts}` : '';
+      card.classList.remove('solved');
+    }
+    if(i===active) highlightCaret();
+    updateProgress();
+  }
+
+  function rerenderAll(){
+    puzzles.forEach((_, i)=> refreshPuzzle(i));
+  }
+
+  function updateProgress(){
+    const solved = puzzles.filter(p=>p.solved).length;
+    document.getElementById('progress').textContent = `Solved ${solved}/${DAILY_COUNT}`;
+  }
+
+  function checkWin(){
+    if(puzzles.every(p=>p.solved)){
+      const totalTries = puzzles.reduce((a,p)=>a+p.attempts,0);
+      const win = document.getElementById('win');
+      document.getElementById('winLine').textContent =
+        `You solved all ${DAILY_COUNT} with ${totalTries} total ${totalTries===1?'try':'tries'}.`;
+      win.classList.remove('hidden');
+    }
+  }
+
+  function isModalOpen(){
+    return !document.getElementById('win').classList.contains('hidden');
+  }
+  function closeWin(){
+    document.getElementById('win').classList.add('hidden');
+  }
+
+  function copyShare(){
+    const date = dateStr;
+    const lines = [];
+    lines.push(`Vowel Void — ${date}`);
+    const solved = puzzles.every(p=>p.solved);
+    const totalTries = puzzles.reduce((a,p)=>a+p.attempts,0);
+    lines.push(`${puzzles.filter(p=>p.solved).length}/${DAILY_COUNT} solved • ${totalTries} ${totalTries===1?'try':'tries'}`);
+    // Build a compact per-puzzle bar: green squares equal number of vowels, red if needed attempts >1
+    puzzles.forEach((p,i)=>{
+      const len = p.blanks.length;
+      const block = p.solved ? '🟩' : '⬜';
+      const bar = block.repeat(Math.max(3, Math.min(8, len)));
+      lines.push(`P${i+1} ${bar} ${p.solved?`(${p.attempts})`:'(—)'}`);
+    });
+    const text = lines.join('\n');
+    navigator.clipboard.writeText(text).then(()=>{
+      toast('Result copied.');
+    },()=>{
+      toast('Copy failed.');
+    });
+  }
+
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(()=> t.textContent = '', 1800);
+  }
+
+  function saveState(){
+    const state = puzzles.map(p=>({
+      word:p.word,
+      clue:p.clue,
+      values:p.values,
+      cursor:p.cursor,
+      attempts:p.attempts,
+      solved:p.solved,
+      hinted:p.hinted
+    }));
+    try{
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }catch(e){}
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(storageKey);
+      if(!raw) return null;
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : null;
+    }catch(e){ return null; }
+  }
+
+  function restoreState(arr){
+    // We only restore if words match today's selection exactly
+    if(!arr || arr.length !== puzzles.length) return;
+    for(let i=0;i<puzzles.length;i++){
+      if(arr[i].word !== puzzles[i].word) return; // mismatch => skip restore
+    }
+    arr.forEach((s, i)=>{
+      const p = puzzles[i];
+      p.values = (s.values || []).slice(0, p.blanks.length);
+      while(p.values.length < p.blanks.length) p.values.push(null);
+      p.cursor = Math.max(0, Math.min(p.blanks.length-1, s.cursor||0));
+      p.attempts = s.attempts||0;
+      p.solved = !!s.solved;
+      p.hinted = !!s.hinted;
+    });
+  }
+
 })();
 </script>
 </body>

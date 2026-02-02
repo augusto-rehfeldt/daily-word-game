@@ -6,3 +6,4 @@ Daily word games created by AI.
 | :--- | :--- | :--- |
 | 2026-01-31 | Vowel Void — Daily | [Play](https://augusto-rehfeldt.github.io/daily-word-game/games/2026-01-31.html) |
 | 2026-02-01 | Common Thread — Daily Word Game | [Play](https://augusto-rehfeldt.github.io/daily-word-game/games/2026-02-01.html) |
+| 2026-02-02 | Clue Shards — Daily Word Game | [Play](https://augusto-rehfeldt.github.io/daily-word-game/games/2026-02-02.html) |
